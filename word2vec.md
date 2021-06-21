@@ -221,7 +221,7 @@ Word2vec (Mikolov et al. 2013) 是一个学习词向量的框架。
 
 
 
-"完形填空"
+**"完形填空"**
 
 <img src="/Users/Wei/Library/Application Support/typora-user-images/Screen Shot 2021-06-20 at 8.55.21 AM.png" alt="Screen Shot 2021-06-20 at 8.55.21 AM" style="zoom:50%;" />
 
@@ -483,7 +483,7 @@ Hierarchiacal Softmax 是对普通softmax更有效的替代方法，下面以CBO
 
 #### 2.4.2.2 Huffman编码
 
-<img src="/Users/Wei/Documents/NLP/NLP/word2vec/huffman_encode.png" alt="huffman_encode" style="zoom:40%;" /> 
+<img src="./word2vec/huffman_encode.png" alt="huffman_encode" style="zoom:40%;" /> 
 
 记左边为1，右边为0，那么编码如下：
 
@@ -510,7 +510,7 @@ Hierarchiacal Softmax 是对普通softmax更有效的替代方法，下面以CBO
 
 下图中红色线路就是我们的单词走过的路径，
 
-<img src="/Users/Wei/Documents/NLP/NLP/word2vec/huffman_obj.png" alt="huffman_obj" style="zoom:30%;" />
+<img src="./word2vec/huffman_obj.png" alt="huffman_obj" style="zoom:30%;" />
 
 
 
