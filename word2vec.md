@@ -434,7 +434,200 @@ $$
 
 ## 2.4 基于Hierarchical Softmax的模型
 
-回忆CBOW和
+### 2.4.1 模型网络结构
+
+Hierarchiacal Softmax 是对普通softmax更有效的替代方法，下面以CBOW为例给出了模型结构：
+
+<img src="./word2vec/cbow_tree.png" alt="cbow_tree" style="zoom:30%;" />
+
+- 样本：(Context(w), w)其中w是中心词，Context(w) 是w窗口大小= c的上下文，
+
+- 输入层：上下文Context(w)中2c 个单词的词向量：$v(Context(w)_i),\ i=1,...,2c$。
+
+- 投影层：直接对2c个词向量进行累加，得到
+  $$
+  x_w=\sum_{i=1}^{2c}v(Context(w)_i)
+  $$
+
+- 输出层：一个Huffman树，其中叶子节点共|V|个，对应于|V|个单词，非叶子节点|V|-1个（图中黄色结点）。
+
+  - 之前的输出层是一个|V|维向量。
+
+### 2.4.2 Huffman Tree
+
+给定n个权值作为n个叶子结点，构造一颗二叉树，使得它的带权路径长度达到最小，则称这样的二叉树为最右二叉树，也称为Huffman树
+
+#### 2.4.2.1 Huffman树的构造
+
+给定n个权值 $\{w_1,...,w_n\}$作为二叉树的n个叶子结点，可以通过下面算法来构造一棵Huffman树
+
+**Huffman 树构造算法**
+
+1. 将 $\{w_1,...,w_n\}$看成n棵树的森林（每棵树仅有一个结点）
+2. 将森林中根结点权值最小的两棵树合并，作为新树的左、右子树，并且新结点的根结点权值为左、右子树根结点权值的和
+3. 从森林中删除选取的两棵树，添加新树
+4. 重复2，3步骤，直到森林中只有一棵树为止
+
+
+
+**例子** 🌰
+
+假设经过统计有:“我”，“喜欢”，“观看”，“巴西”，“足球”，“世界杯”这六个词出现次数分别是15, 8, 6, 5, 3, 1。以这6个词为叶结点，以词频为权值构造Huffman树。
+
+<img src="./word2vec/huffman.png" alt="huffman" style="zoom:50%;" />
+
+- 词频越大的词越接近根结点
+- 在上面例子里，为了方便，统一将词频大的结点作为左孩子结点，词频小的作为右孩子结点
+
+
+
+#### 2.4.2.2 Huffman编码
+
+<img src="/Users/Wei/Documents/NLP/NLP/word2vec/huffman_encode.png" alt="huffman_encode" style="zoom:40%;" /> 
+
+记左边为1，右边为0，那么编码如下：
+
+"我"：0；"喜欢"：111，"观看"：110， "巴西"：101， "足球"：1001， "世界杯"：1000 
+
+发现Huffman编码有下面的特点
+
+- 不等长编码：
+  - 词频高的词编码短，比如”我“
+  - 词频低的词编码长，比如”世界杯“
+  - 一个字符的编码不可能是另一个字符编码的前缀
+
+### 2.4.3 目标函数
+
+为了便于下面的介绍和公式的推导，这里需要预先定义一些变量：
+
+-  $p^w$：从根节点出发，然后到达单词w 对应叶子结点的路径。
+- $l^w$ ：路径$ p^w$中包含的结点的个数。
+- $p_1^w,...,p_{l^w}^w$ : 路径$p^w$ 中对应的各个结点，其中 $p^w_1$代表根结点，而$p^w_{l^w}$ 代表的是单词w对应的结点。
+- $d_1^w,...,d_{l^w}^w\in (0,1)$ : 单词w 对应的哈夫曼编码，一个词的哈夫曼编码是由 $l^w-1$位构成的， $d_j^w$表示路径$p^w$ 中的第j个单词对应的哈夫曼编码，根结点不参与对应的编码。
+- $\theta_1^w,...,\theta_{l^w}^w$ : 路径 $p^w$ 中非叶子节点对应的向量，$\theta_j^w$ 表示路径 $p^w$ 中第 j 个非叶子节点对应的向量。 这里之所以给非叶子节点定义词向量，是因为这里的非叶子节点的词向量会作为下面的一个辅助变量进行计算，在下面推导公式的时候就会发现它的作用了。
+
+#### 例子🌰 w="足球"
+
+下图中红色线路就是我们的单词走过的路径，
+
+<img src="/Users/Wei/Documents/NLP/NLP/word2vec/huffman_obj.png" alt="huffman_obj" style="zoom:30%;" />
+
+
+
+- 整个路径上的5个结点就构成了路径 $p^w$ (红色)
+- 其长度$l^w=5$ ，
+- $p_1^w,...,p_5^w$ 就是路径 $p^w$ 上的五个结点
+  - 其中$p_1^w$ 对应根结点，$p_5^w$ 对应叶子结点
+- $d_1^w, d_2^w, d_3^w, d_4^w, d_5^w$ 分别为1,0,0,1
+  - "足球"对应的哈夫曼编码就是1001。
+-  $\theta_1^w, \theta_2^w, \theta_3^w, \theta_4^w,\theta_5^w$ 是路径 $p^w$ 上的个非叶子节点对应的向量
+
+
+
+**Idea** 💡从根节点到"足球"这个单词，经历了4次分支，而对于这个哈夫曼树而言，每次分支相当于一个二分类。
+
+如何定义正负label呢？
+
+- 自然的，我们可以根据Huffman编码定义，编码为1则为正类，编码为0则为负类（反之亦可）
+
+- 为了和Word2vec源码保持一直，我们将编码为1的认定为负类（左子树），而编码为0的认定为正类（右子树）。
+
+那么一个结点被分到
+
+- 正类的概率是$\sigma(x_w^T\theta)$，其中$\sigma$是Sigmoid函数：
+  $$
+  \sigma(x_w^T\theta) = \frac{1}{1+\exp(-x_w^T\theta)}
+  $$
+  
+
+- 负类的概率是$1- \sigma(x_w^T\theta)$.
+
+- 注意⚠️ 上面包含的参数 $\theta$  就是非叶子对应的向量 $\theta_i^w$。
+
+- 
+
+
+
+对于从根节点出发到达`"足球"`这个叶子节点所经历的4次二分类，将每次分类的概率写出来就是：
+
+- 第一次分类 left： $P(d_2^w|x_w,\theta_1^w)= 1- \sigma(x_w^T\theta_1^w)$
+- 第二次分类 right： $P(d_3^w|x_w,\theta_2^w)= \sigma(x_w^T\theta_2^w)$： 
+- 第三次分类 right： $P(d_4^w|x_w,\theta_3^w)= \sigma(x_w^T\theta_3^w)$： 
+- 第四次分类 left： $P(d_5^w|x_w,\theta_1^w)= 1- \sigma(x_w^T\theta_4^w)$： 
+
+所以，对于单词`"足球"`，我们希望最大化上面的概率之积：
+$$
+P(\text{足球}｜Context(足球)) = \prod_{j=2}^5P(d_j^w|x_w,\theta_{j-1}^w)
+$$
+一般的，
+$$
+P(w｜Context(w)) = \prod_{j=2}^{l^w}P(d_j^w|x_w,\theta_{j-1}^w)
+$$
+其中
+$$
+  P(d_j^w|x_w,\theta_{j-1}^w)= \left\{\begin{array}{@{}l@{}}
+   \sigma(x_w^T\theta_{j-1}^w), \quad d_j^w = 0 \\
+    1- \sigma(x_w^T\theta_{j-1}^w),\quad d_j^w = 1
+  \end{array}\right.\,
+$$
+或者写作
+$$
+P(d_j^w|x_w,\theta_{j-1}^w)= [\sigma(x_w^T\theta_{j-1}^w)]^{1-d_j^w}\cdot
+    [1- \sigma(x_w^T\theta_{j-1}^w)]^{d_j^w}
+$$
+得到目标函数（ log Likelihood）
+$$
+\begin{align}
+J &= \log L(\theta) =  \sum_{w\in C} \sum_{j=2}^{l^w} \log P(d_j^w|x_w,\theta_{j-1}^w) \\
+&=  \sum_{w\in C} \sum_{j=2}^{l^w} \left( ({1-d_j^w})\cdot\log[\sigma(x_w^T\theta_{j-1}^w)]+
+    {d_j^w}\cdot\log[1- \sigma(x_w^T\theta_{j-1}^w)]\right)
+\end{align}
+$$
+为了梯度推导方便起见，将上式中双重求和符号下的内容记为 $L(w,j)$，即:
+$$
+L(w,j) =({1-d_j^w})\cdot\log[\sigma(x_w^T\theta_{j-1}^w)]+
+    {d_j^w}\cdot\log[1- \sigma(x_w^T\theta_{j-1}^w)]
+$$
+
+- 是单词w，路径上第j个结点的“概率”
+
+### 2.4.4 梯度计算和参数更新
+
+- $L(w,j)$ 对参数 $\theta_{j-1}^w$ 的梯度：
+  $$
+  \begin{align}
+  \nabla_{\theta_{j-1}^w}L(w,j) &=({1-d_j^w})\cdot \frac{1}{\sigma(x_w^T\theta_{j-1}^w)}\cdot \sigma(x_w^T\theta_{j-1}^w)(1-\sigma(x_w^T\theta_{j-1}^w))\cdot x_w \\
+  &-  {d_j^w}\cdot \frac{1}{1- \sigma(x_w^T\theta_{j-1}^w)}\cdot\sigma(x_w^T\theta_{j-1}^w)(1- \sigma(x_w^T\theta_{j-1}^w))\cdot x_w
+  \\
+  &=[1-{d_j^w}-\sigma(x_w^T\theta_{j-1}^w))]\cdot x_w
+      
+  \end{align}
+  $$
+
+- $\theta_{j-1}^w$的更新公式为
+  $$
+  \theta_{j-1}^w = \theta_{j-1}^w + \eta[1-{d_j^w}-\sigma(x_w^T\theta_{j-1}^w))]\cdot x_w
+  $$
+
+- $L(w,j)$ 对参数 $x_w$ 的梯度：
+  $$
+  \nabla_{x_w}L(w,j) = [1-{d_j^w}-\sigma(x_w^T\theta_{j-1}^w))]\cdot \theta_{j-1}^w
+  $$
+
+- $x_w$ 的更新公式为：
+  $$
+  \begin{align}
+  v(\tilde{w}) &= v(\tilde{w}) + \eta\sum_{j=2}^{l^w}\nabla_{x_w}L(w,j) \\
+  &= v(\tilde{w}) + \eta\sum_{j=2}^{l^w}[1-{d_j^w}-\sigma(x_w^T\theta_{j-1}^w))]\cdot x_w 
+  \quad\text{   for }\tilde{w} \in Contex(w)
+  \end{align}
+  $$
+
+  - 注意$x_w$是 Contex(w) 中所有单词累加的结果，这里我们需要使用$x_w$来对Contex中的每个单词Contex(w) 进行更新。直接使用 $x_w$的梯度累加对$v(\tilde{w})$进行更新
+
+  
+
+
 
 ## 2.5  基于Negative Sampling的模型
 
@@ -591,6 +784,8 @@ ref https://mp.weixin.qq.com/s?__biz=MjM5MTQzNzU2NA==&mid=2651669277&idx=2&sn=bc
 ## 其他问题
 
 
+
+In practice, hierarchical softmax tends to be better for infrequent words, while negative sam- pling works better for frequent words and lower dimensional vectors.
 
 10）介绍下Hierarchical Softmax的计算过程，怎么把 Huffman 放到网络中的？参数是如何更新的？对词频低的和词频高的单词有什么影响？为什么？
 
