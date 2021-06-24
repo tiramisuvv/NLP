@@ -163,17 +163,15 @@ $$
 
 对于统计语言模型而言，利用最大似然，可把目标函数设为：
 $$
-\prod_{w \in C} P(w|\text{contex}(w))
+L = \prod_{w \in C} P(w|\text{contex}(w))
 $$
 其中 C表示 语料库（Corpus)，Contex(w)表示单词w的上下文
 
 
 
-# 2. Word Embedding 词嵌入
+## 1.6 Word vector
 
-
-## 2.2 Word vector
-### 2.2.1 定义
+### 1.6.1 定义
 
 对于词典D里的任意单词w，都指定一个固定长度的向量$v(w) \in \mathbb{R}^{n}$，就称 $v(w)$ 是w的词向量，n为词向量的长度。 
 
@@ -185,7 +183,7 @@ $$
 - 词向量是稠密的
 - 词语之间的相似性可以通过词向量来体现 => w的词向量与它上下文中的单词的向量相似
 
-### 2.2.2 例子 🌰
+### 1.6.2 例子 🌰
 
 <img src="./word2vec/banking_vector.png" alt="banking_vector" style="zoom:50%;" />
 
@@ -199,6 +197,8 @@ banking_vector.jpg
 
 这里的 **相似性**是指**“结构”相似性**：如果两个词出现在同样的上下文，我们就当做它们相似。如上图come 和 go，含义上是反义词，但在词向量空间很接近。
 
+
+
 ![word_vector_visualization2](./word2vec/word_vector_visualization2.png)
 
 word_vector_visualization2.jpg
@@ -207,9 +207,10 @@ word_vector_visualization2.jpg
 
 
 
-## 2.3 Word2vec 
+# 2. Word2vec 
 
-### 2.3.1 Overview
+## 2.1 Overview
+
 Word2vec (Mikolov et al. 2013) 是一个学习词向量的框架。
 
 #### Idea 💡
@@ -233,28 +234,28 @@ Word2vec (Mikolov et al. 2013) 是一个学习词向量的框架。
 
 banking_example
 
-
-
-### 2.3.2 Details
+## 2.2 Details
 
 Word2vec 包含：
 - **两个学习词向量的模型** 
-  
   - CBOW 通过上下文预测中心词
   - Skip-gram 通过中心词预测上下文
 
  cbow&skipgram.png.jpg
 
-![cbow&skipgram](./word2vec/cbow&skipgram.png) 由图可见，两个模型都包含三层：**输入层**、**投影层**和**输出层**
+![cbow&skipgram](./word2vec/cbow&skipgram.png) 
+
+由图可见，两个模型都包含三层：**输入层**、**投影层**和**输出层**
 
 - **两个训练方法** 降低模型学习过程中的运算量
   
   - negative sampling 负采样
   - hierarchical softmax
 
-### 2.3.3 Continuous Bag of Words Model (CBOW)
+## 2.3 Continuous Bag of Words Model (CBOW)
 
-#### 2.3.3.1 结构
+### 2.3.1 结构
+
 1. simple CBOW
 simple_cbow.jpg
 
@@ -299,7 +300,8 @@ Input:x, output:y
 6. 通过softmax函数把分数转化为概率 `\hat{y} = \text{softmax}(z) \in R^{|V|}`
 7. 我们希望生成的概率`\hat{y}\in R^{|V|}` 与真实 `y\in R^{|V|}` 相匹配，注意这里`y` 也是one-hot。
 
-#### 2.3.3.2 目标函数 Obejective function 
+### 2.3.2 目标函数 Obejective function 
+
 For each position 𝑡 = 1, ... , 𝑇, predict center word `w_c`, given the context words within a window of fixed size m `w_{c-m}, ..., w_{c-1}, w_{c+1},...,w_{c+m}`. 
 
 Data likelihood:
@@ -328,16 +330,15 @@ J = - \frac{1}{T}\log L(\theta)
 
 prob.jpg
 
-#### 2.3.3.3 Gradiant descent and stochastic gradient descent
+### 2.3.3 Gradiant descent and stochastic gradient descent
 
-
-### 2.3.4 Skip-gram
+## 2.4 Skip-gram
 
 ![into_example](./word2vec/into_example.png)
 
 
 
-### 2.3.4.1 目标函数  Obeject function 
+### 2.3.1 目标函数  Obeject function 
 
 对任意的位置 $𝑡 = 1, ... , 𝑇$, 给定中心词 w，预测它的上下文（window of fixed size m） 
 
@@ -377,9 +378,9 @@ $$
      	- "max" :能够让vector中最大的数$x_{max}$ 被取到的概率非常大
      	- "soft" 对于小的值$x_i$ 仍然有概率
 
-### 2.3.4.2 训练模型
+### 2.4.2 训练模型
 
-#### 2.3.4.2.1 Gradiant descent
+#### 2.4.2.1 Gradiant descent
 
 - 沿着梯度下降的方向优化参数<img src="./word2vec/gd.png" alt="gd" style="zoom:30%;" />(gd.jpg)
 
@@ -398,12 +399,25 @@ $$
 
   
 
-  
+  【TODO】Stochastic Gradient Descent 
 
+  -> SGD with minibatch
+  
+  + (+) less noisy than SGD
+  + (+) 更重要 GPU 
+  + 
+  
+  
+  
 - 这里，我们的参数$\theta$ ：总共$|V|$ 单词，每个单词都包含两个d维的向量，所以<img src="./word2vec/theta.png" alt="theta" style="zoom:30%;" />(theta.jpg)
+
+- XXX Grad J => sparse
+
+- XXX     only update the word vectors that accutally apear  
+
 - 下面我们需要对**所有**向量求导
 
-#### 2.3.4.2.2 求导细节
+#### 2.4.2.2 求导细节
 
 $$
 J(\theta) = -\frac{1}{T}\sum_{t=1}^T\sum_{-m\leq j\leq m, j\neq 0}\log P(w_{t+j}|w_t; \theta)
@@ -432,9 +446,9 @@ $$
 
 
 
-## 2.4 基于Hierarchical Softmax的模型
+## 2.5 基于Hierarchical Softmax的模型
 
-### 2.4.1 模型网络结构
+### 2.5.1 模型网络结构
 
 Hierarchiacal Softmax 是对普通softmax更有效的替代方法，下面以CBOW为例给出了模型结构：
 
@@ -453,11 +467,11 @@ Hierarchiacal Softmax 是对普通softmax更有效的替代方法，下面以CBO
 
   - 之前的输出层是一个|V|维向量。
 
-### 2.4.2 Huffman Tree
+### 2.5.2 Huffman Tree
 
-给定n个权值作为n个叶子结点，构造一颗二叉树，使得它的带权路径长度达到最小，则称这样的二叉树为最右二叉树，也称为Huffman树
+给定n个权值作为n个叶子结点，构造一颗二叉树，使得它的带权路径长度达到最小，则称这样的二叉树为最优二叉树，也称为Huffman树
 
-#### 2.4.2.1 Huffman树的构造
+#### 2.5.2.1 Huffman树的构造
 
 给定n个权值 $\{w_1,...,w_n\}$作为二叉树的n个叶子结点，可以通过下面算法来构造一棵Huffman树
 
@@ -481,7 +495,7 @@ Hierarchiacal Softmax 是对普通softmax更有效的替代方法，下面以CBO
 
 
 
-#### 2.4.2.2 Huffman编码
+#### 2.5.2.2 Huffman编码
 
 <img src="./word2vec/huffman_encode.png" alt="huffman_encode" style="zoom:40%;" /> 
 
@@ -496,7 +510,7 @@ Hierarchiacal Softmax 是对普通softmax更有效的替代方法，下面以CBO
   - 词频低的词编码长，比如”世界杯“
   - 一个字符的编码不可能是另一个字符编码的前缀
 
-### 2.4.3 目标函数
+### 2.5.3 目标函数
 
 为了便于下面的介绍和公式的推导，这里需要预先定义一些变量：
 
@@ -542,11 +556,7 @@ Hierarchiacal Softmax 是对普通softmax更有效的替代方法，下面以CBO
 
 - 负类的概率是$1- \sigma(x_w^T\theta)$.
 
-- 注意⚠️ 上面包含的参数 $\theta$  就是非叶子对应的向量 $\theta_i^w$。
-
-- 
-
-
+- 其中参数 $\theta$  就是非叶子对应的向量 $\theta_i^w$。
 
 对于从根节点出发到达`"足球"`这个叶子节点所经历的4次二分类，将每次分类的概率写出来就是：
 
@@ -559,6 +569,8 @@ Hierarchiacal Softmax 是对普通softmax更有效的替代方法，下面以CBO
 $$
 P(\text{足球}｜Context(足球)) = \prod_{j=2}^5P(d_j^w|x_w,\theta_{j-1}^w)
 $$
+**注意⚠️ 这个方法最大的优势是计算概率的时间复杂度是$O(\log(|V|))$，对应着路径的长度。**
+
 一般的，
 $$
 P(w｜Context(w)) = \prod_{j=2}^{l^w}P(d_j^w|x_w,\theta_{j-1}^w)
@@ -591,7 +603,7 @@ $$
 
 - 是单词w，路径上第j个结点的“概率”
 
-### 2.4.4 梯度计算和参数更新
+### 2.5.4 梯度计算和参数更新
 
 - $L(w,j)$ 对参数 $\theta_{j-1}^w$ 的梯度：
   $$
@@ -629,7 +641,7 @@ $$
 
 
 
-## 2.5  基于Negative Sampling的模型
+## 2.6  基于Negative Sampling的模型
 
 回忆
 $$
@@ -643,7 +655,7 @@ $$
 
 （下面以skip gram为例）
 
-### 2.5.1 Idea 💡
+### 2.6.1 Idea 💡
 
 这里我们改变预测相邻单词这一任务：
 
@@ -672,7 +684,7 @@ neg_sampling2.jpg
 neg_sampling3.jpg
 neg_sampling4.jpg
 
-### 2.5.2 目标函数 $J(\theta)$
+### 2.6.2 目标函数 $J(\theta)$
 
 考虑一对中心词c和另一个单词w的词对 (w,c)，
 
@@ -732,12 +744,14 @@ $$
   $$
   其中Z是正则化系数（没有特别说明的情况下，后续会始终用Z表示正则化系数）
 
-- 这个指数$\alpha = 3/4$使得低频词更容易被抽到
+- 这个指数$\alpha = 3/4$使得
+  - 降低高频词被抽中概率
+  - 增加低频词被抽到概率
   -  is: $0.9^{3/4} = 0.92$
   - constitution: $0.09^{3/4} = 0.16$
   - bombastic: $0.01^{3/4} = 0.032$
 
-### 2.5.3 负采样介绍
+### 2.6.3 负采样介绍
 
 **Question** 对于给定的词 w，如果生成w对应的负样本呢？
 
@@ -773,41 +787,88 @@ $$
 
 
 
-### 2.5.4 其他
+## 3. 关于Word2vec的其他问题和思考
 
-**窗口大小和负样本数量**
-
-ref https://mp.weixin.qq.com/s?__biz=MjM5MTQzNzU2NA==&mid=2651669277&idx=2&sn=bc8f0590f9e340c1f1359982726c5a30&chksm=bd4c648e8a3bed9817f30c5a512e79fe0cc6fbc58544f97c857c30b120e76508fef37cae49bc&scene=0&xtrack=1#rd
-
-
-
-## 其他问题
-
-
-
-In practice, hierarchical softmax tends to be better for infrequent words, while negative sam- pling works better for frequent words and lower dimensional vectors.
-
-10）介绍下Hierarchical Softmax的计算过程，怎么把 Huffman 放到网络中的？参数是如何更新的？对词频低的和词频高的单词有什么影响？为什么？
-
-Hierarchical Softmax利用了Huffman树依据词频建树，词频大的节点离根节点较近，词频低的节点离根节点较远，距离远参数数量就多，在训练的过程中，低频词的路径上的参数能够得到更多的训练，所以效果会更好。
-
-（11）Word2Vec有哪些参数，有没有什么调参的建议？
-
-- Skip-Gram 的速度比CBOW慢一点，小数据集中对低频次的效果更好；
-- Sub-Sampling Frequent Words可以同时提高算法的速度和精度，Sample 建议取值为 ；
-- Hierarchical Softmax对低词频的更友好；
-- Negative Sampling对高词频更友好；
-- 向量维度一般越高越好，但也不绝对；
-- Window Size，Skip-Gram一般10左右，CBOW一般为5左右。
-
-（12）Word2Vec有哪些局限性？
+## 3.1 Word2Vec有哪些局限性？
 
 Word2Vec作为一个简单易用的算法，其也包含了很多局限性：
 
 - Word2Vec只考虑到上下文信息，而忽略的全局信息；
 - Word2Vec只考虑了上下文的共现性，而忽略的了彼此之间的顺序性；
 
-Ref
+## 3.2 CBOW vs Skip gram
 
-1. https://mp.weixin.qq.com/s/zDneR1BU6xvt8cndEF4_Xw 
-2. https://mp.weixin.qq.com/s?__biz=MjM5MTQzNzU2NA==&mid=2651669277&idx=2&sn=bc8f0590f9e340c1f1359982726c5a30&chksm=bd4c648e8a3bed9817f30c5a512e79fe0cc6fbc58544f97c857c30b120e76508fef37cae49bc&scene=0&xtrack=1#rd
+- cbow比skip-gram训练快
+- skip-gram比cbow更好地处理生僻字
+- skip-gram 出来的准确率比cbow 高
+  - 在计算时，cbow会将context word 加起来， 在遇到生僻词是，预测效果将会大大降低。skip-gram则会预测生僻字的使用环境。
+- Ref [Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/pdf/1301.3781.pdf)
+
+## 3.3 Hierarchical Softmax vs Negative Sampling
+
+In practice, hierarchical softmax tends to be better for infrequent words, while negative sampling works better for frequent words and lower dimensional vectors.
+
+1. Hierarchical Softmax对词频低的和词频高的单词有什么影响？为什么？
+
+   Hierarchical Softmax利用了Huffman树依据词频建树，词频大的节点离根节点较近，词频低的节点离根节点较远，距离远参数数量就多，在训练的过程中，低频词的路径上的参数能够得到更多的训练，所以效果会更好。
+
+2. Negative Sampling 对词频低的和词频高的单词有什么影响？为什么？
+
+## 3.4 word2vec的参数选择
+
+- Skip-Gram 的速度比CBOW慢一点，小数据集中对低频次的效果更好；
+- Sub-Sampling Frequent Words可以同时提高算法的速度和精度，Sample 建议取值为 $[10^{-5}, 10^{-3}]$；
+- Hierarchical Softmax对低词频的更友好；
+- Negative Sampling对高词频更友好；
+- 向量维度一般越高越好，但也不绝对；
+  - [最小熵原理](https://kexue.fm/archives/7695/comment-page-1 )
+- Window Size，Skip-Gram一般10左右，CBOW一般为5左右。
+  - 不同的任务适合不同的窗口大小。
+  - 使用较小的窗口大小（2-15）会得到这样的嵌入：两个嵌入之间的高相似性得分表明这些单词是可互换的（注意，如果我们只查看附近距离很近的单词，反义词通常可以互换——例如，好的和坏的经常出现在类似的语境中）。
+  - 使用较大的窗口大小（15-50，甚至更多）会得到相似性更能指示单词相关性的嵌入。
+  - Gensim默认窗口大小为5（除了输入字本身以外还包括输入字之前与之后的两个字）。
+- 负样本的数量原始论文认为5-20个负样本是比较理想的数量。当你拥有足够大的数据集时，2-5个似乎就已经足够了。Gensim默认为5个负样本。
+
+## 3.5 其他问题
+
+### 3.5.1 Word2Vec为什么需要两个词向量矩阵
+
+1. 方便计算梯度，如果使用同一个词向量矩阵，$J(\theta)$的分母出现二次项$v_c^Tv_c$ ，
+2. Ref [知乎](https://www.zhihu.com/question/278791534)
+
+### 3.5.2 Word2vec碰到新词怎么办？
+
+1. unk技巧
+
+   - 在训练word2vec之前，预留一个<unk>符号，把所有stopwords或者低频词都替换成unk，之后使用的时候，也要保留一份词表，对于不在word2vec词表内的词先替换为unk。
+
+   - 源代码中，有删除低频词的操作：若某个词在语料库中出现次数小于**min_count**，则将其从词典中删除
+
+   - 当数据中出现大量<UNK>时，势必会影响模型的性能
+
+2. subword技巧
+
+   - 这个技巧出自fasttext，简而言之就是对oov词进行分词，分词之后再查找，找到的就保留，找不到的继续分词，直到最后分到字级别，肯定是可以找到的对应字向量的。
+
+3. BPE技巧
+
+   - BPE(byte pair encoder)，字节对编码，也可以叫做digram coding双字母组合编码。BPE首先把一个完整的句子分割为单个的字符，频率最高的相连字符对合并以后加入到词表中，直到达到目标词表大小。对测试句子采用相同的subword分割方式。BPE分割的优势是它可以较好的平衡词表大小和需要用于句子编码的token数量。BPE的缺点在于，它不能提供多种分割的概率。
+
+   此外还有很多技巧啦，如word2vec的增量学习，这里就不赘述了。
+
+   ref
+
+   [知乎1](https://www.zhihu.com/question/329708785)
+
+   [知乎2](https://www.zhihu.com/question/308543084)
+
+   
+
+Reference
+
+1. [CS224n Lec1](https://www.youtube.com/watch?v=8rXD5-xhemo&list=PLoROMvodv4rOhcuXMZkNm7j3fVwBBY42z)
+2. [CS224n Lec1 Notes](http://web.stanford.edu/class/cs224n/index.html#schedule)
+3. [CS224n Reading Notes](https://github.com/LooperXX/CS224n-Reading-Notes/blob/master/CS224n-2019-01-Introduction%20and%20Word%20Vectors.pdf)
+4. [Word2Vec中的数学原理详解](https://www.cnblogs.com/peghoty/p/3857839.html)
+5. [深入浅出Word2Vec原理解析](https://mp.weixin.qq.com/s/zDneR1BU6xvt8cndEF4_Xw)
+6. [图解Word2vec，读这一篇就够了](https://mp.weixin.qq.com/s?__biz=MjM5MTQzNzU2NA==&mid=2651669277&idx=2&sn=bc8f0590f9e340c1f1359982726c5a30&chksm=bd4c648e8a3bed9817f30c5a512e79fe0cc6fbc58544f97c857c30b120e76508fef37cae49bc&scene=0&xtrack=1#rd)
