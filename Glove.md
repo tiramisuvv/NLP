@@ -32,8 +32,6 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 
 ## 3.3 Extrinsic word vector evaluation
 
-Extrinsic evaluation of word vectors: All subsequent NLP tasks in this class. More examples soon. •
-
 - One example where good word vectors should help directly: **named entity recognition**
 
   - identifying references to a person, organization or location 
@@ -335,5 +333,31 @@ Table 3 shows results on five different word similarity datasets. A similarity s
 - To make one’s way (pike along) 
 - In Australian English, pike means to pull out from doing something: I reckon he could have climbed that cliff, but he piked!
 
+**Solution** 用pseudo word Improving Word Representations Via Global Context And Multiple Word Prototypes
 
+**Idea**💡: Cluster word windows around words, retrain with each word assigned to multiple different clusters bank1, bank2, etc 
+
+<img src="/Users/Wei/Documents/NLP/NLP/glove/ambiguity.png" alt="ambiguity" style="zoom:50%;" />
+
+如上图中桃红色单词jaguar: jaguar1,...,jaguar4
+
+**Problem** 大部分情况下，词义之前的区分不明显！很多单词的词意是相关或者overlap的
+
+
+
+**Anthoter Solution** Linear Algebraic Structure of Word Senses, with Applications to Polysemy 
+
+- Different senses of a word reside in a linear superposition (weighted sum) in standard word embeddings like word2vec 
+
+- $$
+  v_{\text{pike}} = \alpha_1v_{\text{pike}_1}+\alpha_2v_{\text{pike}_2}+\alpha_3v_{\text{pike}_3}
+  $$
+
+-  其中$\alpha_1 = \frac{f_1}{f_1+f_2+f_3}$，for frequency f
+
+- **result** Because of ideas from sparse coding you can actually seperate out the sense 
+
+-  [TODO]
+
+- <img src="/Users/Wei/Documents/NLP/NLP/glove/ambiguity2.png" alt="ambiguity2" style="zoom:50%;" />
 
