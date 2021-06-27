@@ -36,7 +36,7 @@
 
 - I enjoy flying
 
-  <img src="/Users/weiwang/Documents/NLP/glove/cooccirence_example.png" alt="cooccirence_example" style="zoom:50%;" />
+  <img src="./glove/cooccirence_example.png" alt="cooccirence_example" style="zoom:50%;" />
 
 
 
@@ -68,11 +68,11 @@
 
 使用SVD方法将共现矩阵X分解为 $U\Sigma V^T$，其中$\Sigma$是特征值矩阵，U，V是对应于行和列的正交基。
 
-<img src="/Users/weiwang/Documents/NLP/glove/svd.png" alt="svd" style="zoom:50%;" />
+<img src="./glove/svd.png" alt="svd" style="zoom:50%;" />
 
 通过取前k个最大的特征值，对X进行降维。
 
-<img src="/Users/weiwang/Documents/NLP/glove/svd2.png" alt="svd2" style="zoom:50%;" />
+<img src="./glove/svd2.png" alt="svd2" style="zoom:50%;" />
 
 
 
@@ -89,7 +89,7 @@
 
 **=> Idea 💡** 对计数进行处理是可以得到有效的词向量的
 
-<img src="/Users/weiwang/Documents/NLP/glove/coals_model.png" alt="coals_model" style="zoom:50%;" />
+<img src="./glove/coals_model.png" alt="coals_model" style="zoom:50%;" />
 
 ⚠️**Interesting semantic patterns emerge in the vectors**:
 
@@ -105,7 +105,7 @@
 
 👉：基于预测的方法：定义概率分布并试图预测单词
 
-<img src="/Users/weiwang/Documents/NLP/glove/count_baased_vs_prediction.png" alt="count_baased_vs_prediction" style="zoom:50%;" />
+<img src="./glove/count_baased_vs_prediction.png" alt="count_baased_vs_prediction" style="zoom:50%;" />
 
 # 
 
@@ -117,11 +117,11 @@
 
 **Crucial Insight** Ratio of co-occurrence probablilities can encode meaning components
 
-<img src="/Users/weiwang/Documents/NLP/glove/co-occurrence_prob1.png" alt="co-occurrence_prob1" style="zoom:50%;" />
+<img src="./glove/co-occurrence_prob1.png" alt="co-occurrence_prob1" style="zoom:50%;" />
 
 
 
-<img src="/Users/weiwang/Documents/NLP/glove/co-occurrence_prob2.png" alt="co-occurrence_prob2" style="zoom:50%;" />
+<img src="./glove/co-occurrence_prob2.png" alt="co-occurrence_prob2" style="zoom:50%;" />
 
 
 
@@ -160,22 +160,22 @@ $$
 
 ### 2.4.1 Nearest words
 
-<img src="/Users/weiwang/Documents/NLP/glove/glove_result.png" alt="glove_result" style="zoom:50%;" />
+<img src="./glove/glove_result.png" alt="glove_result" style="zoom:50%;" />
 
 
 ### 2.4.2 Visualizations
 
 #### 2.4.2.1 Women -- man
 
-<img src="/Users/weiwang/Documents/NLP/glove/glove_visualization1.png" alt="glove_visualization1" style="zoom:50%;" />
+<img src="./glove/glove_visualization1.png" alt="glove_visualization1" style="zoom:50%;" />
 
 #### 2.4.2.2 Company-CEO
 
-<img src="/Users/weiwang/Documents/NLP/glove/glove_visualization2.png" alt="glove_visualization2" style="zoom:50%;" />
+<img src="./glove/glove_visualization2.png" alt="glove_visualization2" style="zoom:50%;" />
 
 #### 2.4.2.3 Comparatives and Superlatives
 
-<img src="/Users/weiwang/Documents/NLP/glove/glove_visualization3.png" alt="glove_visualization3" style="zoom:50%;" />
+<img src="./glove/glove_visualization3.png" alt="glove_visualization3" style="zoom:50%;" />
 # 3. How to evaluate word vectors
 
 ## 3.1 概述
@@ -196,11 +196,11 @@ $$
 ## 3.2 Intrinsic word vector evaluation
 
 ### 3.2.1 Word Vector Analogies
-<img src="/Users/weiwang/Documents/NLP/glove/word_vector_analogies.png" alt="word_vector_analogies" style="zoom:50%;" />
+<img src="./glove/word_vector_analogies.png" alt="word_vector_analogies" style="zoom:50%;" />
 
 dea 💡** Evaluate word vectors by how well their cosine distance after addition captures intuitive semantic and syntactic analogy questions （余弦距离能多好的捕捉到语义和句法类比问题）
 
-<img src="/Users/weiwang/Documents/NLP/glove/word_vector_analogies2.png" alt="word_vector_analogies2" style="zoom:30%;" />
+<img src="./glove/word_vector_analogies2.png" alt="word_vector_analogies2" style="zoom:30%;" />
 
 - 要从搜索中去掉input单词
 - **Problem** 如果信息非线性，怎么办？[TODO]
