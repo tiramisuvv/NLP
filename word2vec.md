@@ -354,6 +354,12 @@ $$
 
 为了最小化目标函数 $J(\theta)$ ，有下面问题：
 
+- **Question:  [High Level] 如何最小化目标函数**
+
+- **Answer** 把相似词放在空间距离近的位置$\rightarrow$ 对于词向量，引入**点乘** 当作距离度量。
+
+- <img src="/Users/weiwang/Documents/NLP/word2vec/word_vector_visualization3.png" alt="word_vector_visualization3" style="zoom:50%;" />
+
 - **Question：如何计算$P(w_{t+j}|w_t; \theta)$？**
 
 - **Answer** 对每个单词w，使用两个词向量
@@ -382,6 +388,8 @@ $$
 
 #### 2.4.2.1 Gradiant descent
 
+##### a. Idea 
+
 - 沿着梯度下降的方向优化参数<img src="./word2vec/gd.png" alt="gd" style="zoom:30%;" />(gd.jpg)
 
 - **Idea** 对现在的参数 $\theta$ ，计算目标函数 $J(\theta)$ 的梯度，然后沿着负向梯度小步向下。（重复这个过程，直到结束）<img src="./word2vec/gr2.png" alt="gr2" style="zoom:30%;" />
@@ -399,25 +407,27 @@ $$
 
   
 
-  【TODO】Stochastic Gradient Descent 
+##### b. Stochastic Gradient Descent 
 
-  -> SGD with minibatch
-  
-  + (+) less noisy than SGD
-  + (+) 更重要 GPU 
-  + 
-  
-  
-  
-- 这里，我们的参数$\theta$ ：总共$|V|$ 单词，每个单词都包含两个d维的向量，所以<img src="./word2vec/theta.png" alt="theta" style="zoom:30%;" />(theta.jpg)
+每次只用单个样本更新
 
-- XXX Grad J => sparse
 
-- XXX     only update the word vectors that accutally apear  
 
-- 下面我们需要对**所有**向量求导
+##### c. SGD with minibatch
+
++ (+) less noisy than SGD
++ (+) 更重要 可以在GPU上并行计算 
+
+##### d. Stochastic gradients with word vectors
+
+- 这里，我们的参数$\theta$ ：总共$|V|$ 单词，每个单词都包含两个d维的向量，所以<img src="./word2vec/theta.png" alt="theta" style="zoom:30%;" />
+- $ \nabla_{\theta} J(\theta)$ 非常稀疏，所以只更新实际出现的向量 
+  - 需要稀疏矩阵更新操作来只更新矩阵U和V中的特定行
+  - 需要保留词向量的散列？
 
 #### 2.4.2.2 求导细节
+
+- 下面我们需要对**所有**向量求导
 
 $$
 J(\theta) = -\frac{1}{T}\sum_{t=1}^T\sum_{-m\leq j\leq m, j\neq 0}\log P(w_{t+j}|w_t; \theta)
@@ -553,7 +563,6 @@ Hierarchiacal Softmax 是对普通softmax更有效的替代方法，下面以CBO
   \sigma(x_w^T\theta) = \frac{1}{1+\exp(-x_w^T\theta)}
   $$
   
-
 - 负类的概率是$1- \sigma(x_w^T\theta)$.
 
 - 其中参数 $\theta$  就是非叶子对应的向量 $\theta_i^w$。
@@ -731,7 +740,6 @@ $$
   -\log \sigma(u_{c-m+j}^Tv_c) -\sum _{k=1}^K\log\sigma(\tilde{u}_k^Tv_c)
   $$
   
-
 - **CBOW** 对应给定的上下文向量$\hat{v}=\frac{v_{c-m}+v_{c-1}+...+v_{c+1}+v_{c+m}}{2m}$来观察中心词向量 $u_c$的目标函数：
   $$
   -\log \sigma(u_c^T\hat{v}) -\sum _{k=1}^K\log\sigma(\tilde{u}_k^T\hat{v})
@@ -862,7 +870,12 @@ In practice, hierarchical softmax tends to be better for infrequent words, while
 
    [知乎2](https://www.zhihu.com/question/308543084)
 
-   
+
+### 3.5.3 其他Tips
+
+- 去掉the, and, that, of 这样的停用词，可以使词向量效果更好 
+- [reading](https://zhuanlan.zhihu.com/p/335347401)
+- 
 
 Reference
 
