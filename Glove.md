@@ -36,7 +36,7 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 
   - identifying references to a person, organization or location 
 
-    <img src="/Users/Wei/Documents/NLP/NLP/glove/extrinsic_example.png" alt="extrinsic_example" style="zoom:50%;" />
+    <img src="./glove/extrinsic_example.png" alt="extrinsic_example" style="zoom:50%;" />
 
     
 
@@ -69,6 +69,13 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 
 1. 与word2vec类似
 2. 关注单词周围的某个window内的单词，获取一些语法和语义（syntactic and semantic）信息
+
+**Notations** 
+
+- $X$: word-word 的共现矩阵
+- $X_{ij}$ = 单词 j 出现在单词 i 上下文的次数
+- $X_i := \sum_{k}X_{ik}$ = 任意单词 k 出现在单词 i 的上下文的次数
+- $P_{ij}:= P(w_j|w_i)=\frac{X_{ij}}{X_i}$ 是单词 j 出现在单词 i 上下文的概率
 
 **例子🌰**
 
@@ -153,7 +160,7 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 
 # 
 
-# 2 Glove
+# 2 Glove[TODO]
 
 ## 2.1 Idea
 
@@ -174,6 +181,12 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 [TODO]**希望 Ratio of co- occurrence probabilities TO BE linear!**
 
 Encoding meaning components in vector differences
+
+GloVe: • Using global statistics to predict the probability of word j appearing in the context of word i with a least squares objective
+
+, GloVe consists of a weighted least squares model that trains on global word-word co-occurrence counts and thus makes efficient use of statistics. T
+
+
 
 ## 2.2 模型
 
@@ -248,7 +261,7 @@ The dataset contains 19,544 such questions,
 
 #### 2.5.1.2 Accuracy结果比较 
 
-<img src="/Users/Wei/Documents/NLP/NLP/glove/results.png" alt="results" style="zoom:50%;" />
+<img src="./glove/results.png" alt="results" style="zoom:50%;" />
 
 - Results= percent accuracy. 
 - <u>Underlined scores</u> = best within groups of similarly-sized models;
@@ -267,7 +280,7 @@ The dataset contains 19,544 such questions,
 
 ##### a. Dimension & window size
 
-<img src="/Users/Wei/Documents/NLP/NLP/glove/parameters1.png" alt="parameters1" style="zoom:50%;" /> 
+<img src="./glove/parameters1.png" alt="parameters1" style="zoom:50%;" /> 
 
 - Good dimension is ~300
 - Semantic效果随window size增加而提升
@@ -277,13 +290,13 @@ The dataset contains 19,544 such questions,
 
 ##### b. More training time helps
 
-<img src="/Users/Wei/Documents/NLP/NLP/glove/parameters2.png" alt="parameters2" style="zoom:30%;" />  More training time helps
+<img src="./glove/parameters2.png" alt="parameters2" style="zoom:30%;" />  More training time helps
 
 
 
 ##### c. Wikipedia is better than news text!
 
-<img src="/Users/Wei/Documents/NLP/NLP/glove/parameters3.png" alt="parameters3" style="zoom:40%;" /> 
+<img src="./glove/parameters3.png" alt="parameters3" style="zoom:40%;" /> 
 
 - More data helps
 - Wikipedia is better than news text!
@@ -296,15 +309,15 @@ The dataset contains 19,544 such questions,
 
 Word vector distances and their correlation with human judgments
 
-<img src="/Users/Wei/Documents/NLP/NLP/glove/word_similarity.png" alt="word_similarity" style="zoom:50%;" />
+<img src="./glove/word_similarity.png" alt="word_similarity" style="zoom:50%;" />
 
 **例子**🌰
 
-<img src="/Users/Wei/Documents/NLP/NLP/glove/word_similarity2.png" alt="word_similarity2" style="zoom:20%;" />
+<img src="./glove/word_similarity2.png" alt="word_similarity2" style="zoom:20%;" />
 
 
 
-<img src="/Users/Wei/Documents/NLP/NLP/glove/word_similarity_result.png" alt="word_similarity_result" style="zoom:50%;" />Table 3: Spearman rank correlation on word similarity tasks. All vectors are 300-dimensional. The CBOW∗ vectors are from the word2vec website and differ in that they contain phrase vectors.
+<img src="./glove/word_similarity_result.png" alt="word_similarity_result" style="zoom:50%;" />Table 3: Spearman rank correlation on word similarity tasks. All vectors are 300-dimensional. The CBOW∗ vectors are from the word2vec website and differ in that they contain phrase vectors.
 
 Table 3 shows results on five different word similarity datasets. A similarity score is obtained from the word vectors by first normalizing each feature across the vocabulary and then calculating the cosine similarity. We compute Spearman’s rank correlation coefficient between this score and the human judgments. CBOW∗ denotes the vectors available on the word2vec website that are trained with word and phrase vectors on 100B words of news data. GloVe outperforms it while using a corpus less than half the size. Table 4 shows results on the NER task
 
@@ -337,7 +350,7 @@ Table 3 shows results on five different word similarity datasets. A similarity s
 
 **Idea**💡: Cluster word windows around words, retrain with each word assigned to multiple different clusters bank1, bank2, etc 
 
-<img src="/Users/Wei/Documents/NLP/NLP/glove/ambiguity.png" alt="ambiguity" style="zoom:50%;" />
+<img src="./glove/ambiguity.png" alt="ambiguity" style="zoom:100%;" />
 
 如上图中桃红色单词jaguar: jaguar1,...,jaguar4
 
@@ -359,5 +372,5 @@ Table 3 shows results on five different word similarity datasets. A similarity s
 
 -  [TODO]
 
-- <img src="/Users/Wei/Documents/NLP/NLP/glove/ambiguity2.png" alt="ambiguity2" style="zoom:50%;" />
+- <img src="./glove/ambiguity2.png" alt="ambiguity2" style="zoom:50%;" />
 
