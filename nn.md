@@ -2,7 +2,13 @@
 
 
 
-word window classification - entity recognition 
+<img src="/Users/Wei/Library/Application Support/typora-user-images/Screen Shot 2021-07-03 at 5.37.57 PM.png" alt="Screen Shot 2021-07-03 at 5.37.57 PM" style="zoom:50%;" />
+
+# Classification in traditional ML and NLP
+
+<img src="/Users/Wei/Library/Application Support/typora-user-images/Screen Shot 2021-07-03 at 5.42.28 PM.png" alt="Screen Shot 2021-07-03 at 5.42.28 PM" style="zoom:50%;" />
+
+word window classification - named entity recognition 
 
 Nll - negtive log likelihood
 
@@ -26,15 +32,31 @@ $\theta$= W :weight + $v_w$:word vector
 
 
 
-Named Entity Recognition
+## Named Entity Recognition(NER)
 
 Task：find the classify names in text:
 
+<img src="/Users/Wei/Library/Application Support/typora-user-images/Screen Shot 2021-07-03 at 5.44.49 PM.png" alt="Screen Shot 2021-07-03 at 5.44.49 PM" style="zoom:50%;" />
+
 Why difficult 
 
+Solution: Idea Window classification
+
+Binary classification
 
 
-Gradient by hand - Matrix calculate 
+
+
+
+
+
+
+
+## Gradient by hand - Matrix calculate 
+
+
+
+
 
 1. n input &1 output $f(x) = f(x1, ..., x_n)$, $\frac{\part f}{\part x} = \left[\frac{\part f}{\part x_1},...,\frac{\part f}{\part x_n}\right]$
 2. n input & m output $f(x) = [f_1(x1, ..., x_n),...,f_m(x1, ..., x_n)]$, ...
