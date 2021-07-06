@@ -1,6 +1,6 @@
-# 3. How to evaluate word vectors
+# 1. How to evaluate word vectors
 
-## 3.1 概述
+## 1.1 概述
 
 **Answer** Intrinsic vs. extrinsic 内在与外在
 
@@ -15,9 +15,9 @@
   - Unclear if the subsystem is the problem or its interaction or other subsystems 
   - If replacing exactly one subsystem with another improves accuracy -> Winning!
 
-## 3.2 Intrinsic word vector evaluation
+## 1.2 Intrinsic word vector evaluation
 
-### 3.2.1 Word Vector Analogies
+### 1.2.1 Word Vector Analogies
 
 <img src="./glove/word_vector_analogies.png" alt="word_vector_analogies" style="zoom:50%;" />
 
@@ -30,7 +30,7 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 
 
 
-## 3.3 Extrinsic word vector evaluation
+## 1.3 Extrinsic word vector evaluation
 
 - One example where good word vectors should help directly: **named entity recognition**
 
@@ -38,15 +38,13 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 
     <img src="./glove/extrinsic_example.png" alt="extrinsic_example" style="zoom:50%;" />
 
-    
-
     Table 4: F1 score on NER task with 50d vectors. Discrete is the baseline without word vectors. We use publicly-available vectors for HPCA, HSMN, and CW. See text for deta
 
-# 1. 共现矩阵 Co-occurrence Matrix 
+# 2. 共现矩阵 Co-occurrence Matrix 
 
-## 1.1. 两种共现矩阵
+## 2.1. 两种共现矩阵
 
-### 1.1.1 Word- Document Matrix
+### 2.1.1 Word- Document Matrix
 
 **假设/猜想** 关联的单词会经常出现在同一个文章中。
 
@@ -63,7 +61,7 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 
  **用途举例** general topics (all sports terms will have similar entries) leading to “Latent Semantic Analysis”
 
-### 1.1.2 Window base co-occurence matrix
+### 2.1.2 Window base co-occurence matrix
 
 **Idea 💡** 计算每个单词在特定大小的窗口中出现的次数，得到$\mathbb{R}^{|V|\times |V|}$的共现矩阵
 
@@ -101,21 +99,21 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 
 **部分解决方法**
 
-- 忽略功能次，如"the","he","has"等
+- 忽略功能词，如"the","he","has"等
 - 使用ramp window，即根据文档中单词之间的距离对共现计数进行加权(不懂，TODO)
 - 使用 Pearson correlation并将负计数设置为0，而不是原始计数
 
 
 
-## 1.2 怎么定义共现向量 （co-occurence vectors）
+## 2.2 怎么定义共现向量 （co-occurence vectors）
 
-### 1.2.1 传统方法 Dimensionality Reduction on X 
+### 2.2.1 传统方法 Dimensionality Reduction on X 
 
-#### 1.2.1.1 Idea 💡 
+#### 2.2.1.1 Idea 💡 
 
 - 在一个固定的低维的稠密向量中，保存***大部分***重要信息
 
-#### 1.2.1.2 构造方法
+#### 2.2.1.2 构造方法
 
 使用SVD方法将共现矩阵X分解为 $U\Sigma V^T$，其中$\Sigma$是特征值矩阵，U，V是对应于行和列的正交基。
 
@@ -127,7 +125,7 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 
 
 
-### 1.2.2 Hacks on X
+### 2.2.2 Hacks on X
 
 - 在原始计数矩阵上，用SVD效果不好！
 - 按比例调整计数对效果有很大提升-- **Scaling the counts**
@@ -135,7 +133,7 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
     - $\log(\text{frequencies})$
     - $\min(x,t),  \text{ with } t = 100$ ：对高频词（频次>t）设置固定频次
     - 忽略功能词
-- 使用ramp window，即基于在文档中词与词之间的距离给共现计数加上一个权值
+- 使用ramp window，即基于在文档中词与词之间的距离给共现计数加上一个权值[TODO]
 - 使用 Pearson correlation并将负计数设置为0
 
 **=> Idea 💡** 对计数进行处理是可以得到有效的词向量的
@@ -150,7 +148,7 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 
 
 
-### 1.2.3 总结&对比
+### 2.2.3 总结&对比[TODO]
 
 👈：基于计数的方法：使用整个矩阵的全局统计数据来直接估计
 
@@ -158,11 +156,11 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 
 <img src="./glove/count_baased_vs_prediction.png" alt="count_baased_vs_prediction" style="zoom:50%;" />
 
-# 
 
-# 2 Glove[TODO]
 
-## 2.1 Idea
+# 3 Glove
+
+## 3.1 Idea
 
 目标：把上述两种方法结合起来，用NN+某种计数矩阵
 
@@ -170,11 +168,9 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 
 <img src="./glove/co-occurrence_prob1.png" alt="co-occurrence_prob1" style="zoom:50%;" />
 
-
+例如我们想区分热力学上两种不同状态ice冰与蒸汽steam，它们之间的关系可通过与不同的单词 ![[公式]](https://www.zhihu.com/equation?tex=x) 的co-occurrence probability 的比值来描述，例如对于solid固态，虽然 ![[公式]](https://www.zhihu.com/equation?tex=P%28solid%7Cice%29) 与 ![[公式]](https://www.zhihu.com/equation?tex=P%28solid%7Csteam%29) 本身很小，不能透露有效的信息，但是它们的比值 ![[公式]](https://www.zhihu.com/equation?tex=%5Cfrac%7BP%28solid%7Cice%29%7D%7BP%28solid%7Csteam%29%7D) 却较大，因为solid更常用来描述ice的状态而不是steam的状态，所以在ice的上下文中出现几率较大，对于gas则恰恰相反，而对于water这种描述ice与steam均可或者fashion这种与两者都没什么联系的单词，则比值接近于1。所以相较于单纯的co-occurrence probability，实际上co-occurrence probability的相对比值更有意义。
 
 <img src="./glove/co-occurrence_prob2.png" alt="co-occurrence_prob2" style="zoom:50%;" />
-
-
 
 重点是Difference between  co- occurrence probabilities
 
@@ -188,7 +184,7 @@ GloVe: • Using global statistics to predict the probability of word j appearin
 
 
 
-## 2.2 模型
+## 3.2 模型
 
 **Question**: How can we capture ratios of co-occurrence probabilities as linear meaning components in a word vector space
 
@@ -202,16 +198,55 @@ w_x\cdot (w_a- w_b) = \log \frac{P(x|a)}{P(x|b)}
 $$
 
 
-## 2.3 目标函数
 
-[TODO]怎么得到的（ref https://zhuanlan.zhihu.com/p/60208480）
+## 3.3 目标函数
+
+怎么得到的模型和目标函数（ref https://zhuanlan.zhihu.com/p/60208480）
 $$
 J = \sum_{i, j = 1}^{V} f(X_{ij})\left(w_i^T \tilde{w}_j+b_i+\tilde{b}_j-\log X_{ij}\right)^2
 $$
 
-- Bias term 如果word common
+**“简化假设做back-of-envelope计算合理推断”**
 
+基于对于以上概率比值的观察，我们假设模型的函数有如下形式：
 
+![[公式]](https://www.zhihu.com/equation?tex=F%28w_i%2Cw_j%2C%5Ctilde+w_k%29+%3D+%5Cfrac%7BP_%7Bik%7D%7D%7BP_%7Bjk%7D%7D)
+
+其中， ![[公式]](https://www.zhihu.com/equation?tex=%5Ctilde%7Bw%7D) 代表了context vector，如上例中的solid，gas，water，fashion等。 ![[公式]](https://www.zhihu.com/equation?tex=w_i%2Cw_j) 则是我们要比较的两个词汇，如上例中的ice，steam。
+
+![[公式]](https://www.zhihu.com/equation?tex=F)的可选的形式过多，我们希望有所限定。首先我们希望的是 ![[公式]](https://www.zhihu.com/equation?tex=F) 能有效的在单词向量空间内表示概率比值，由于向量空间是线性空间，一个自然的假设是 ![[公式]](https://www.zhihu.com/equation?tex=F) 是关于向量 ![[公式]](https://www.zhihu.com/equation?tex=w_i%2Cw_j) 的差的形式：
+
+![[公式]](https://www.zhihu.com/equation?tex=F%28w_i-w_j%2C%5Ctilde+w_k%29+%3D+%5Cfrac%7BP_%7Bik%7D%7D%7BP_%7Bjk%7D%7D)
+
+等式右边为标量形式，左边如何操作能将矢量转化为标量形式呢？一个自然的选择是矢量的点乘形式：
+
+![[公式]](https://www.zhihu.com/equation?tex=F%28%28w_i-w_j%29%5ET%5Ctilde+w_k%29+%3D+%5Cfrac%7BP_%7Bik%7D%7D%7BP_%7Bjk%7D%7D)
+
+在此，作者又对其进行了对称性分析，即对于word-word co-occurrence，将向量划分为center word还是context word的选择是不重要的，即我们在交换 ![[公式]](https://www.zhihu.com/equation?tex=w%5Cleftrightarrow+%5Ctilde+w) 与 ![[公式]](https://www.zhihu.com/equation?tex=X%5Cleftrightarrow+X%5ET) 的时候该式仍然成立。如何保证这种对称性呢？
+
+我们分两步来进行，
+
+- 首先要求满足 ![[公式]](https://www.zhihu.com/equation?tex=F%28%28w_i-w_j%29%5ET%5Ctilde+w_k%29+%3D+%5Cfrac%7BF%28w_i%5ET%5Ctilde+w_k%29%7D%7BF%28w_j%5ET%5Ctilde+w_k%29%7D) ，该方程的解为 ![[公式]](https://www.zhihu.com/equation?tex=F%3Dexp) 
+
+- 同时与 ![[公式]](https://www.zhihu.com/equation?tex=F%28%28w_i-w_j%29%5ET%5Ctilde+w_k%29+%3D+%5Cfrac%7BP_%7Bik%7D%7D%7BP_%7Bjk%7D%7D) 相比较有 ![[公式]](https://www.zhihu.com/equation?tex=F%28w_i%5ET%5Ctilde+w_k%29%3DP_%7Bik%7D%3D%5Cfrac%7BX_%7Bik%7D%7D%7BX_i%7D)所以， ![[公式]](https://www.zhihu.com/equation?tex=w_i%5ET%5Ctilde+w_k+%3D+log%28P_%7Bik%7D%29+%3D+log%28X_%7Bik%7D%29-log%28X_i%29)
+
+注意其中 ![[公式]](https://www.zhihu.com/equation?tex=log%28X_i%29) 破坏了交换 ![[公式]](https://www.zhihu.com/equation?tex=w%5Cleftrightarrow+%5Ctilde+w) 与 ![[公式]](https://www.zhihu.com/equation?tex=X%5Cleftrightarrow+X%5ET) 时的对称性，但是这一项并不依赖于 ![[公式]](https://www.zhihu.com/equation?tex=k) ，所以我们可以将其融合进关于 ![[公式]](https://www.zhihu.com/equation?tex=w_i) 的bias项 ![[公式]](https://www.zhihu.com/equation?tex=b_i) ，第二部就是为了平衡对称性，我们再加入关于 ![[公式]](https://www.zhihu.com/equation?tex=%5Ctilde+w_k) 的bias项 ![[公式]](https://www.zhihu.com/equation?tex=%5Ctilde+b_k) ，我们就可以得到 ![[公式]](https://www.zhihu.com/equation?tex=w_i%5ET%5Ctilde+w_k+%2B+b_i+%2B+%5Ctilde+b_k+%3D+log%28X_%7Bik%7D%29) 的形式。
+
+另一方面作者注意到模型的一个缺点是对于所有的co-occurence的权重是一样的，即使是那些较少发生的co-occurrence。作者认为这些可能是噪声，所以他加入了前面的 ![[公式]](https://www.zhihu.com/equation?tex=f%28X_%7Bij%7D%29) 项来做weighted least squares regression模型，即为
+
+![[公式]](https://www.zhihu.com/equation?tex=J%3D%5Csum_%7Bi%2Cj%3D1%7D%5EVf%28X_%7Bij%7D%29%28w_i%5ET%5Ctilde+w_j+%2B+b_i+%2B+%5Ctilde+b_j+-logX_%7Bij%7D%29%5E2) 的形式。
+
+其中权重项 ![[公式]](https://www.zhihu.com/equation?tex=f) 需满足一下条件：
+
+1. ![[公式]](https://www.zhihu.com/equation?tex=f%280%29%3D0) ，因为要求 ![[公式]](https://www.zhihu.com/equation?tex=lim_%7Bx%5Crightarrow+0%7Df%28x%29log%5E2x) 是有限的。
+
+2. 较少发生的co-occurrence所占比重较小。
+
+3. 对于较多发生的co-occurrence， ![[公式]](https://www.zhihu.com/equation?tex=f%28x%29) 也不能过大。
+
+   <img src="https://pic1.zhimg.com/80/v2-1bb617d9d19afa01999e5fcc0f1745a8_1440w.jpg" alt="img" style="zoom:50%;" />
+
+   <img src="https://pic1.zhimg.com/80/v2-df9c9c0c6ed72525a197182161706c64_1440w.jpg" alt="img" style="zoom:50%;" />
 
 ## 2.4 模型结果
 
@@ -301,7 +336,7 @@ The dataset contains 19,544 such questions,
 - More data helps
 - Wikipedia is better than news text!
   - Wikipedia 本身包含各种“关系”
-- 
+- [Common Crawl]
 
 ### 2.5.2 Word similarity task
 
@@ -370,7 +405,7 @@ Table 3 shows results on five different word similarity datasets. A similarity s
 
 - **result** Because of ideas from sparse coding you can actually seperate out the sense 
 
--  [TODO]
+-  [TODO]怎么区分不同含义的单词
 
 - <img src="./glove/ambiguity2.png" alt="ambiguity2" style="zoom:50%;" />
 
