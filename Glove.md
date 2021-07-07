@@ -152,7 +152,27 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 
 👈：基于计数的方法：使用整个矩阵的全局统计数据来直接估计
 
+优点 ✅
+
+- 训练非常迅速。 
+- 能够有效的利用统计信息
+
+缺点  ❎
+
+- 主要用于获取词汇之间的相似性（其他任务表现差）
+- 给定大量数据集，重要性与权重不成比例。
+
 👉：基于预测的方法：定义概率分布并试图预测单词
+
+优点 ✅
+
+- 能够对其他任务有普遍的提高。 
+- 能够捕捉到含词汇相似性外的复杂模式。
+
+缺点  ❎
+
+- 需要大量的数据集。
+- 不能够充分利用统计信息。
 
 <img src="./glove/count_baased_vs_prediction.png" alt="count_baased_vs_prediction" style="zoom:50%;" />
 
@@ -166,9 +186,18 @@ dea 💡** Evaluate word vectors by how well their cosine distance after additio
 
 **Crucial Insight** Ratio of co-occurrence probablilities can encode meaning components
 
-<img src="./glove/co-occurrence_prob1.png" alt="co-occurrence_prob1" style="zoom:50%;" />
+假定我们关心两个中心词，$w_i$ 和 $w_j$，我们通过给定不同的单词 $w_k$，研究他们共现的概率，来判定$w_i$ 和 $w_j$的关系。
 
-例如我们想区分热力学上两种不同状态ice冰与蒸汽steam，它们之间的关系可通过与不同的单词 ![[公式]](https://www.zhihu.com/equation?tex=x) 的co-occurrence probability 的比值来描述，例如对于solid固态，虽然 ![[公式]](https://www.zhihu.com/equation?tex=P%28solid%7Cice%29) 与 ![[公式]](https://www.zhihu.com/equation?tex=P%28solid%7Csteam%29) 本身很小，不能透露有效的信息，但是它们的比值 ![[公式]](https://www.zhihu.com/equation?tex=%5Cfrac%7BP%28solid%7Cice%29%7D%7BP%28solid%7Csteam%29%7D) 却较大，因为solid更常用来描述ice的状态而不是steam的状态，所以在ice的上下文中出现几率较大，对于gas则恰恰相反，而对于water这种描述ice与steam均可或者fashion这种与两者都没什么联系的单词，则比值接近于1。所以相较于单纯的co-occurrence probability，实际上co-occurrence probability的相对比值更有意义。
+下面，假定那么我们可以通过给定不同的单词$w_k$，研究
+
+下面，我们想区分热力学上两种不同状态ice冰与蒸汽steam （$w_i=$ ice，$w_j=$ steam），它们之间的关系可通过与不同的单词 ![[公式]](https://www.zhihu.com/equation?tex=x) 的co-occurrence probability 的比值来描述：
+
+- 例如对于x = solid，
+  -  $P(\text{solid}|\text{ice})$ 与 $ P(\text{solid}|\text{steam})$  的值本身很小，不能透露有效的信息;
+  - 它们的比值 $\frac{ P(\text{solid}|\text{ice})}{ P(\text{solid}|\text{steam})}$ 却较大
+    - 因为solid更常用来描述ice的状态而不是steam的状态，所以在ice的上下文中出现几率较大，对于gas则恰恰相反
+- 而对于x = water这种描述ice与steam均可，或者x = fashion这种与两者都没什么联系的单词，则比值接近于1。
+- 所以相较于单纯的co-occurrence probability，实际上 **ratio** of co-occurrence probability更有意义。
 
 <img src="./glove/co-occurrence_prob2.png" alt="co-occurrence_prob2" style="zoom:50%;" />
 
