@@ -2,63 +2,221 @@
 
 <img src="/Users/Wei/Library/Application Support/typora-user-images/Screen Shot 2021-07-06 at 10.39.24 AM.png" alt="Screen Shot 2021-07-06 at 10.39.24 AM" style="zoom:50%;" />
 
-# Structure of Sentences
+# 1. Structure of Sentences
 
-1. Phrase structure 词组结果
+语言的结构，一般可以有两种视角：
 
-   ![Screen Shot 2021-07-06 at 10.43.14 AM](/Users/Wei/Library/Application Support/typora-user-images/Screen Shot 2021-07-06 at 10.43.14 AM.png)
+1. constituency 组成关系：
+   - 主要关心的是句子是怎么构成的，词怎么组成短语。
+   - 所以研究Constituency主要是研究忽略语义的“ 语法” 结构（content-free grammars） 。
+2. dependency 依赖关系。
+   - 主要关心的是句子中的每一个词， 都依赖于哪个其他的词。
 
-- 抓住“结构”，与上下文/单词含义无关
-  - Rule1: "Noun Phrase (NP)"
-    - 比如 the cat，a dog -> NP =  determiner + noun
-    - 再比如 the large cat, a barking dog,  -> NP = determiner + (adj) +noun
-    - 进一步 the large cat in a crate, -> NP = determiner + (adj) +noun + prep
-  - Rule 2: Preposition Phrase (PP) = Prep + NP
-    - => The cat by the large crate on the large table by the door
-  - Rule 3: verb phrase = Verb + PP
+## 1.1 Consistency grammer
+
+> 💡 Consisteny 
+>
+> ​       = Phrase structure grammar
+>
+> ​       = context-free grammars(CFGs) 
+>
+> ​      = 抓住“结构”，与上下文/单词含义无关
+
+### 1.1.1 结构
+
+1. **Starting unit: words**
+
+   - the, cat, cuddly, by, door
+
+   <img src="./dependency_parsing/consistency_step1.png" alt="consistency_step1" style="zoom:50%;" />
+
+2. **Words combine into phrases**
+
+   - the cuddly cat,   by the door
+
+   <img src="./dependency_parsing/consistency_step2.png" alt="consistency_step2" style="zoom:50%;" />
+
+3. **Phrases can combine into bigger phrases**
+
+   - the cuddly cat by the door  
+
+     <img src="./dependency_parsing/consistency_step3.png" alt="consistency_step3" style="zoom:50%;" />
+
+- `Det` 指的是 **Determiner**，在语言学中的含义为 **限定词**
+  
+- `NP` 指的是 **Noun Phrase** ，在语言学中的含义为 **名词短语**
+
+- `VP` 指的是 **Verb Phrase** ，在语言学中的含义为 **动词短语**
+
+- `P` 指的是 **Preposition** ，在语言学中的含义为 **介词**
+
+- - `PP` 指的是 **Prepositional Phrase** ，在语言学中的含义为 **介词短语**
+
+- Rule1: "Noun Phrase (NP)"
+
+  - 比如 the cat，a dog =>  `NP =  Det + N`
+  - 再比如 the large cat, a barking dog => `NP = Det + (adj) + N`
+  - 进一步 the large cat in a crate => `NP = Det + (adj) + N + Prep`
+
+- Rule 2: Preposition Phrase 
+
+  - `PP = Prep + NP`
+
+  - => The cat by the large crate on the large table by the door
+
+- Rule 3: `VP = V + PP`
 
 类似可以一层一层的，建一个长句子.
 
-Phrase Structure Grammar tree
+## 1.2 Denpendency structur
 
-2. Denpendency structur
+这种观点在计算语言学中占主导地位：不是使用各种类型的短语，而是直接通过单词与其他的单词关系表示句子的结构，显示哪些单词依赖于(修饰或是其参数)哪些其他单词
 
-   <img src="/Users/weiwang/Documents/NLP/dependency_parsing/dependency_structure.png" alt="dependency_structure" style="zoom:50%;" />
+<img src="./dependency_parsing/dependency_structure.png" alt="dependency_structure" style="zoom:50%;" />
 
-   
+- `Look` 是整个句子的 root, 依赖于 `dog` （或者说，`dog` 是 `Look` 的依赖）
+- `for the large barking`  是 `dog`的修饰[Question: 修饰 vs 依赖]
+- `by`, `the` 都是 `door`的依赖
+- `by the door`是 `dog` 的依赖
 
-   <img src="/Users/weiwang/Documents/NLP/dependency_parsing/why_need_sentence_structure.png" style="zoom:50%;" />
+## 1.3 Why do we need sentence structure?
 
-例子🌰 
+- We need to understand sentence structure in order to be able to interpret language correctly
+
+  - 为了能够正确地解释语言，我们需要理解句子结构
+
+- Humans communicate complex ideas by composing words together into bigger units to convey complex meanings
+
+  - 人类通过将单词组合成更大的单元来传达复杂的意思，从而交流复杂的思想
+
+- We need to know what is connected to what
+
+  - 我们需要知道什么与什么相关联
+
+- - 除非我们知道哪些词是其他词的参数或修饰词，否则我们无法弄清楚句子是什么意思
+
+    
+
+## 1.4 Ambiguities
+
+### 1.4.1 Prepositional phrase attachment ambiguity 介词短语依附歧义
+
+#### 例子1 🌰 
 
 San Jose cops kill man with knife.
 
-- knife -> cops
-- knife -> man 
+- `cops` 是`kill` 的 subject;
+- `man` 是 `kill` 的 object
 
-Some ambiguity examples
+<img src="./dependency_parsing/pp_amb1.png" alt="pp_amb1" style="zoom:50%;" />
 
-1. 🌰 PP attachment ambiguities multiply 
+**理解1** 警察用刀杀了那个男子
 
-<img src="/Users/weiwang/Documents/NLP/dependency_parsing/pp_amb.png" alt="pp_amb" style="zoom:50%;" />
+- `knife`是 `kill` 的 modifier(修饰符-> 名称修饰符，nmod) 
+- 如上图绿色
 
-2. 🌰 coordination scope ambiguity
+**理解2**  警察杀了那个有刀的男子
 
-   - [(Shuttle veteran and longtime NASA executive) Fred Gregory] appointed to board.
+- `knife`是 `man` 的 modifier(修饰符) 
 
-   - (Shuttle veteran) and (longtime NASA executive Fred Gregory) appointed to board.
+#### 例子2 🌰 
 
-3. 🌰 Adjectival Modifier Ambiguity
+Scientists count whales from space
 
-   - Students get first hand job experience 
+- `from space` 这一介词短语修饰的是前面的动词 `count` 还是名词 `whales` ？ 
 
-4. 🌰 Verb Phrase(VP) attachment ambiguity
+<img src="./dependency_parsing/pp_amb2.png" alt="pp_amb2" style="zoom:50%;" />
 
 
 
-### Dependency Grammar and Dependency Structure
+> A key parsing decision is **how we 'attach' various counstituents**
+>
+> - PPs, adverbial or participial phrases, infinitives, coordinations
 
-<img src="/Users/weiwang/Documents/NLP/dependency_parsing/dependency_tree.png" style="zoom:50%;" />
+#### 例子3 🌰
+
+<img src="./dependency_parsing/pp_amb3.png" alt="pp_amb3" style="zoom:50%;" />
+
+- 上述句子中有四个介词短语
+- `board` 是 `approved` 的 主语，`acquisition` 是 `approved` 的宾语
+- `by Royal Trustco Ltd.` 是修饰 `acquisition` 的，即董事会批准了这家公司的收购
+- `of Toronto` 可以修饰 `approved, acquisition, Royal Trustco Ltd.` 之一，经过分析可以得知是修饰 `Royal Trustco Ltd.` 即表示这家公司的位置
+- `for $27 a share` 修饰 `acquisition`
+- `at its monthly meeting` 修饰 `approved` ，即表示批准的时间地点
+
+
+
+面对这样复杂的句子结构，我们需要考虑 **指数级** 的可能结构，这个序列被称为 **Catalan numbers**
+
+**Catalan numbers : ** $C_n = (2n)!/[(n+1)!n!]$ 指数增长的序列
+
+### 1.4.2 Coordination scope ambiguity 协调范围模糊
+
+#### 1.4.2.1 例子1 🌰
+
+<img src="./dependency_parsing/cor_amb1.png" alt="cor_amb1" style="zoom:50%;" />
+
+- [(Shuttle veteran and longtime NASA executive) Fred Gregory] appointed to board.
+- (Shuttle veteran) and (longtime NASA executive Fred Gregory) appointed to board.
+
+#### 1.4.2.2 例子2
+
+<img src="./dependency_parsing/cor_amb2.png" alt="cor_amb2" style="zoom:50%;" />
+
+- Doctor: [No heart], [cognitive issues]
+  - `,` 表达 and 的含义
+  - [No heart] and [cognitive issues]
+
+- Doctor: No [[heart, cognitive] issues]
+  - `,` 表达 or 的含义
+  - No [ [heart or cognitive] issues]
+
+
+
+### 1.4.3  Adjectival Modifier Ambiguity 形容词修饰语歧义
+
+<img src="./dependency_parsing/adj_amb1.png" alt="adj_amb1" style="zoom:50%;" />
+
+- Students get [[first hand] job experience]
+  - `first hand` 第一手的，直接的
+  - 学生获得了直接的工作经验
+- Students get [first [hand job] experience]
+  - hand job ...
+
+
+
+### 1.4.4 Verb Phrase(VP) attachment ambiguity 动词短语依存歧义
+
+<img src="./dependency_parsing/vb_amb.png" alt="vb_amb" style="zoom:50%;" />
+
+- `to be used for Olympic beach volleyball` 是 动词短语 (VP)
+- 修饰的是 `body` 还是 `beach`
+
+
+
+### 1.4.5 Solution :  Dependency paths
+
+> Dependency paths help extract semantic interpretation
+
+例句🌰 The results *demonstrated that KaiC interacts rhythmically* with KaiA, KaiB, and SasA.
+
+<img src="./dependency_parsing/dependency_paths.png" alt="dependency_paths" style="zoom:50%;" />
+
+
+
+# 2. Dependency Grammar and Dependency Structure
+
+## 2.1 Dependency Structure 的两种表现形式
+
+### 2.1.1 直接在句子上标出依存关系箭头及语法关系
+
+<img src="./dependency_parsing/representation1.png" style="zoom:50%;" />
+
+### 2.1.2 Dependence Tree Graph
+
+<img src="./dependency_parsing/representation2.png" style="zoom:50%;" />
+
+<img src="./dependency_parsing/dependency_tree.png" style="zoom:50%;" />
 
 - 课程中只用arrow，不用type（nsubj,etc)
 - the arrow connects a ***head*** (governor,superior, regent) with a ***dependent*** (modifier, inferior, subordinate)
@@ -66,11 +224,11 @@ Some ambiguity examples
 
 ## Treebanks
 
-<img src="/Users/weiwang/Documents/NLP/dependency_parsing/treebank.png" alt="treebank" style="zoom:50%;" />
+<img src="./dependency_parsing/treebank.png" alt="treebank" style="zoom:50%;" />
 
 - 🎯goal of "universal dependency": have a uniform parallel system of dependency description which could be used for any human language 
 
-<img src="/Users/weiwang/Documents/NLP/dependency_parsing/treebank2.png" alt="treebank2" style="zoom:50%;" />
+<img src="./dependency_parsing/treebank2.png" alt="treebank2" style="zoom:50%;" />
 
 * 与 “Grammar”相比的好处：telling what is the right structure for ambiguous sentences
 
@@ -78,15 +236,15 @@ Some ambiguity examples
 
 A model to capture what is the right parse
 
-<img src="/Users/weiwang/Documents/NLP/dependency_parsing/dependency_preference.png" style="zoom:50%;" />
+<img src="./dependency_parsing/dependency_preference.png" style="zoom:50%;" />
 
-<img src="/Users/weiwang/Documents/NLP/dependency_parsing/dependence_parsing.png" style="zoom:50%;" />
+<img src="./dependency_parsing/dependence_parsing.png" style="zoom:50%;" />
 
 ### Method : Transition-based parsing or deterministic dependency parsing
 
 1. parsing的具体过程举例
 
-<img src="/Users/weiwang/Documents/NLP/dependency_parsing/Transition-based parsing1.png" alt="Transition-based parsing1" style="zoom:50%;" /><img src="/Users/weiwang/Documents/NLP/dependency_parsing/Transition-based parsing2.png" alt="Transition-based parsing2" style="zoom:50%;" />
+<img src="./dependency_parsing/Transition-based parsing1.png" alt="Transition-based parsing1" style="zoom:50%;" /><img src="./dependency_parsing/Transition-based parsing2.png" alt="Transition-based parsing2" style="zoom:50%;" />
 
  
 
@@ -102,16 +260,16 @@ A model to capture what is the right parse
         - Features: top of stack word, POS; first in buffer word, POS; etc
       - There is NO search (in the simplest form)
 
-<img src="/Users/weiwang/Documents/NLP/dependency_parsing/malparser.png" alt="malparser" style="zoom:50%;" />
+<img src="./dependency_parsing/malparser.png" alt="malparser" style="zoom:50%;" />
 
-<img src="/Users/weiwang/Documents/NLP/dependency_parsing/conventioalfeaturerepresentation.png" alt="conventioalfeaturerepresentation" style="zoom:50%;" />
+<img src="./dependency_parsing/conventioalfeaturerepresentation.png" alt="conventioalfeaturerepresentation" style="zoom:50%;" />
 
 - logistic regression, SVM 等算法已经可以做的不错
 - 下面会介绍Neural dependency parsing
 
 ## Evaluation
 
- <img src="/Users/weiwang/Documents/NLP/dependency_parsing/evaluation1.png" alt="evaluation1" style="zoom:50%;" />
+ <img src="./dependency_parsing/evaluation1.png" alt="evaluation1" style="zoom:50%;" />
 
 - UAS = 忽略label (nsubj, root, etc)，只看arc的正确率 
 
@@ -121,9 +279,9 @@ A model to capture what is the right parse
 
 ## Why train a neural dependency parser？
 
-<img src="/Users/weiwang/Documents/NLP/dependency_parsing/why_neural.png" alt="why_neural" style="zoom:50%;" />
+<img src="./dependency_parsing/why_neural.png" alt="why_neural" style="zoom:50%;" />
 
-<img src="/Users/weiwang/Documents/NLP/dependency_parsing/neural_parser.png" alt="neural_parser" style="zoom:50%;" />
+<img src="./dependency_parsing/neural_parser.png" alt="neural_parser" style="zoom:50%;" />
 
-<img src="/Users/weiwang/Documents/NLP/dependency_parsing/model_architecture.png" style="zoom:50%;" />
+<img src="./dependency_parsing/model_architecture.png" style="zoom:50%;" />
 
