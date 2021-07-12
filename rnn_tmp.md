@@ -1,3 +1,32 @@
+<img src="./rnn/plan.png" alt="plan" style="zoom:50%;" />
+
+# Language Model
+
+<img src="/Users/Wei/Documents/NLP/NLP/language_model/def1.png" alt="def1" style="zoom:50%;" />
+
+- classifier ，给出 V 中任何一个单词 w 出现的概率
+
+![def2](/Users/Wei/Documents/NLP/NLP/language_model/def2.png)
+
+
+
+Some application
+
+1. 手机打单词，会补全；
+2. Google search
+
+
+
+- **Question: How would you learn a language model?**
+- **Ans** (pre Deep Learning) n-gram language model
+- 
+
+
+
+
+
+
+
 input x: 一个句子，长度记为 $T_x$
 
 - $x^{<t>}$ word at position t
