@@ -198,7 +198,7 @@ Scientists count whales from space
 
 > Dependency paths help extract semantic interpretation
 
-例句🌰 The results *demonstrated that KaiC interacts rhythmically* with KaiA, KaiB, and SasA.
+例句🌰 The results demonstrated that KaiC interacts rhythmically with KaiA, KaiB, and SasA.
 
 <img src="./dependency_parsing/dependency_paths.png" alt="dependency_paths" style="zoom:50%;" />
 
@@ -206,39 +206,102 @@ Scientists count whales from space
 
 # 2. Dependency Grammar and Dependency Structure
 
+关联语法假设句法结构包括词汇项之间的关系，通常是二元不对称关系(“箭头”)，称为依赖关系
+
 ## 2.1 Dependency Structure 的两种表现形式
 
 ### 2.1.1 直接在句子上标出依存关系箭头及语法关系
 
 <img src="./dependency_parsing/representation1.png" style="zoom:50%;" />
 
+- Pro 原始句子内容清楚
+
+- Con 关系结构不够清楚
+
 ### 2.1.2 Dependence Tree Graph
 
 <img src="./dependency_parsing/representation2.png" style="zoom:50%;" />
 
-<img src="./dependency_parsing/dependency_tree.png" style="zoom:50%;" />
+- Pro 关系结构清楚
+- Con 原始句子内容（顺序）不清楚
 
-- 课程中只用arrow，不用type（nsubj,etc)
-- the arrow connects a ***head*** (governor,superior, regent) with a ***dependent*** (modifier, inferior, subordinate)
-- dependencies form a ***tree***(connected, acyclic, single-head)
+**图释**
 
-## Treebanks
+- 箭头上通常会标记（**type**）语法关系，比如 subject、prepositional object、apposition等。
+  - 课程中只用arrow，不用type（nsubj,etc)
+- 关系：
+  - the arrow connects a ***head*** (governor,superior, regent) with a ***dependent*** (modifier, inferior, subordinate)
+    - A $\rightarrow$ 依赖于/修饰 A的部分
+  - dependencies form a ***tree***(connected, acyclic, single-head)
+    - 连通，无环，单向
+- 依赖关系标签的系统，例如 **universal dependency** 通用依赖
+
+
+
+### 2.1.3 例子和注意
+
+<img src="/Users/weiwang/Documents/NLP/dependency_parsing/example.png" style="zoom:50%;" />
+
+- 箭头的方向不统一，不同paper可能不一致；
+- 通常，添加伪根节点 `ROOT`  指向整个句子的头部，这样，每个单词都精确地依赖于另一个节点
+
+## 2.2 Universal Dependencies treebanks
+
+ref [universal dependencies](https://universaldependencies.org/)
+
+### 2.2.1 例子🌰
 
 <img src="./dependency_parsing/treebank.png" alt="treebank" style="zoom:50%;" />
 
-- 🎯goal of "universal dependency": have a uniform parallel system of dependency description which could be used for any human language 
+### 2.2.2 目标与优缺点
 
-<img src="./dependency_parsing/treebank2.png" alt="treebank2" style="zoom:50%;" />
+- **🎯goal of  "universal dependency"**：
 
-* 与 “Grammar”相比的好处：telling what is the right structure for ambiguous sentences
+  - have a uniform parallel system of dependency description which could be used for any human language 
 
+- **Cons**
 
+  - 开始时候，构建 treebank 似乎比构建语法要慢的多，也没有那么有用
+    - 语法可以一条规则捕捉很多东西，非常效率
+    - 但是，在实践中并不好用：语法规则符号越来越复杂，并且没有共享和重用人类所做的工作
 
-A model to capture what is the right parse
+- **Pros**
+
+  - 劳动力的可重用性
+
+  - - 许多解析器、词性标记器等可以构建在它之上
+    - 语言学的宝贵资源
+
+  - 广泛的覆盖面，而不仅仅是一些直觉
+
+  - 频率和分布信息（Frequencies and distributional information）：
+
+    - 因为ML模型就是学习这种commoners and the frequency of things 
+
+  - 一种评估系统的方法
+
+  - 与 “Grammar”相比的好处：telling what is the right structure for ambiguous sentences
+
+  
+
+- 所以我们需要一个模型来capture what is the ***right parse***
+
+### 2.2.3 Dependency parsing的需要考虑哪些信息
+
+1. **Bilexical affinities** = word的含义
+   1. 🌰 [discussion $\rightarrow$ issues] 看上去是合理的
+   2.  [discussion $\rightarrow$ outstanding] 看上去是wierd的，所以不应该有这个依赖性 （下图绿色x）
+2. **Dependency distance** 大部分的依赖发生在相邻词之间
+3. **Intervening material** 依赖很少跨越介于中间的动词或标点符号
+4. **Valency of heads**：How many dependents on which side are usual for a head?
 
 <img src="./dependency_parsing/dependency_preference.png" style="zoom:50%;" />
 
+### 2.2.4 Dependency Parsing的构造/结构
+
 <img src="./dependency_parsing/dependence_parsing.png" style="zoom:50%;" />
+
+
 
 ### Method : Transition-based parsing or deterministic dependency parsing
 
