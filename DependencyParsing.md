@@ -240,9 +240,7 @@ Scientists count whales from space
 
 ### 2.1.3 例子和注意
 
-<img src="/Users/weiwang/Documents/NLP/dependency_parsing/example.png" style="zoom:50%;" />
-
-- 箭头的方向不统一，不同paper可能不一致；
+- <img src="./dependency_parsing/example.png" alt="example" style="zoom:50%;" />箭头的方向不统一，不同paper可能不一致；
 - 通常，添加伪根节点 `ROOT`  指向整个句子的头部，这样，每个单词都精确地依赖于另一个节点
 
 ## 2.2 Universal Dependencies treebanks
@@ -286,7 +284,9 @@ ref [universal dependencies](https://universaldependencies.org/)
 
 - 所以我们需要一个模型来capture what is the ***right parse***
 
-### 2.2.3 Dependency parsing的需要考虑哪些信息
+### 2.3 Dependency parsing
+
+### 2.3.1 Dependency parsing的需要考虑哪些信息
 
 1. **Bilexical affinities** = word的含义
    1. 🌰 [discussion $\rightarrow$ issues] 看上去是合理的
@@ -297,54 +297,199 @@ ref [universal dependencies](https://universaldependencies.org/)
 
 <img src="./dependency_parsing/dependency_preference.png" style="zoom:50%;" />
 
-### 2.2.4 Dependency Parsing的构造/结构
+### 2.3.2 Dependency Parsing的构造/结构
 
-<img src="./dependency_parsing/dependence_parsing.png" style="zoom:50%;" />
+- A sentence is parsed by choosing for each word what other word (including ROOT) is it a dependent of.
+- 一些限制 => 满足下面的条件使得可以构建成树结构
+  - ROOT 只有一个dependent
+  - 无环
 
+- 箭头是否能相交
+  - 有crossing dependencies => non- projective
+    - [give $\rightarrow$ tomorrow] 和 [talk $\rightarrow$ network] 两个箭头有相交<img src="./dependency_parsing/non-projective.png" alt="non-projective" style="zoom:50%;" />
+    - 英语***大部分***情况下是projective的
 
+### 2.3.3 Method : Transition-based parsing 
 
-### Method : Transition-based parsing or deterministic dependency parsing
+> 💡  **state machine** which defines the possible transitions to create the mapping from the input sentence to the dependency tree
 
-1. parsing的具体过程举例
+#### 2.3.3.1 状态 State 
 
-<img src="./dependency_parsing/Transition-based parsing1.png" alt="Transition-based parsing1" style="zoom:50%;" /><img src="./dependency_parsing/Transition-based parsing2.png" alt="Transition-based parsing2" style="zoom:50%;" />
+**结构**
+
+- a stack $\sigma$, written with top to the right 
+  - which starts with the ROOT symbol 
+- a buffer $\beta$, written with top to the left 
+  - which starts with the input sentence 
+- a set of dependency arcs A 
+  - which starts off empty 
+
+**状态** 对任意的句子 $S = w_0w_1...w_n$，一个状态可以表述为一个三元组 $c = (\sigma, \beta, A)$
+
+- a stack $\sigma$，包含 S 中的单词们 $w_i$ 
+- a buffer $\beta$，包含 S 中的单词们 $w_i$
+- a set of dependency arcs A 
+  - 形式：$(w_i, r, w_j)$ 其中 $w_i$, $w_j$ 来自S，r描述了依存关系（dependency relation）
+- Remark
+  - 初始状态 $c_0 = ([w_0]_{\sigma}, [w_1,...,w_n]_{\beta}, \varnothing)$：只有 `ROOT`  在 $\sigma$ 中，其他单词都在 $\beta$ 中；
+  - 终止状态 $(\sigma, []_{\beta}, A))$
+
+#### 2.3.3.2 转化 Transitions
+
+- `Shift` 把buffer中第一个单词，push到$\sigma$ 的栈顶
+- `Left-Arc` 中 A中添加dependency arc $(w_j, r, w_i)$ ，然后从 $\sigma$ 里去掉 $w_i$
+  - $w_i$ = the word second to the top of the stack
+  - $w_j$ = the word at the top of the stack
+- `Right-Arc` 中 A中添加dependency arc $(w_i, r, w_j)$ ，然后从 $\sigma$ 里去掉 $w_j$
+  - $w_i$ = the word second to the top of the stack
+  - $w_j$ = the word at the top of the stack
+
+- <img src="./dependency_parsing/Basic_transition-based_dependency_parser.png" alt="Basic_transition-based_dependency_parser" style="zoom:50%;" />
+
+#### 2.3.3.3 例子🌰 ： Arc-standard transition-based parser
+
+**分析 "I ata fish"**
+
+- 黑框 stack：处理过的单词，起始状态是 [root]
+- 橙框 buffer：待处理的单词，起始状态是整个句子，终止状态是 [空]
+
+<img src="./dependency_parsing/Transition_based_parsing1.png" alt="Transition-based parsing1" style="zoom:50%;" />
+
+- 第二步中，因为 `[root]` $\rightarrow$ `I` 是错误的dependency，所以下一步继续shift `ate` 进stack
+- 第三步中，因为有 `I` $\leftarrow$ `ate` 的dependency，所以下一步做Left Arc
+
+<img src="./dependency_parsing/Transition_based_parsing2.png" alt="Transition-based parsing2" style="zoom:50%;" />
 
  
 
-2. **Question** 如何决定每一步正确的action (shift, left arc, right arc, etc)
-   1. 遍历所有可能 （指数级）
-   2. dynamic programming（过去使用的方法）
-   3. MaltParser 用ML classifier预测下一步的action
-      - Each action is predicted by a discrimnatvie classifier (e.g. softmax classifier) over each legal move
-        - Max of 3 uptyped choices (shift, left arc, right arc);
-        - Max of |R| X 2 + 1 when typed
-          - put labeds on the dependencies 
-          - |R| different labels
-        - Features: top of stack word, POS; first in buffer word, POS; etc
-      - There is NO search (in the simplest form)
+- 第二步得到结果中，有 `ate` $\rightarrow$ `fish`的dependency，所以下一步做Right Arc
 
-<img src="./dependency_parsing/malparser.png" alt="malparser" style="zoom:50%;" />
+
+
+#### 2.3.4 如何决定每一步正确的action (shift, left arc, right arc, etc)
+
+1. 遍历所有可能 （指数级）
+
+2. dynamic programming（过去使用的方法）$\geq O(n^3)$
+
+3. MaltParser 用ML classifier预测下一步的action $O(n)$
+   
+   
+
+## 2.4 MaltParser
+
+### 2.4.1 介绍
+
+- Each action is predicted by a discrimnatvie classifier (e.g. softmax classifier) over each legal move
+  - Max of 3 uptyped choices (shift, left arc, right arc);
+  - Max of |R| X 2 + 1 when typed
+    - put labels on the dependencies (label: subject, object, etc)
+    - |R| different labels
+    - 🌰 (left arc + subject)，（right arc + object)
+  - Features: top of stack word, POS; first in buffer word, POS; etc
+- There is NO search (in the simplest form)
+  - But you can profitably do a beam search if you wish (slower but better)
+    - You keep k good parse prefixes at each time step 
+- The model’s accuracy is fractionally below the state of the art in dependency parsing, but 
+- 【快】It provides **very fast linear time parsing**, with high accuracy – great for parsing the web
+
+### 2.4.2 Conventional Feature Representation
+
+[TODO]
 
 <img src="./dependency_parsing/conventioalfeaturerepresentation.png" alt="conventioalfeaturerepresentation" style="zoom:50%;" />
 
 - logistic regression, SVM 等算法已经可以做的不错
-- 下面会介绍Neural dependency parsing
+- 
 
-## Evaluation
+## 2.5 Neural dependency parsing
+
+### 2.5.1 Why train a neural dependency parser？
+
+- **Problem 1**: 在conversional里，features are very sparse
+- **Problem 2**: incomplete
+
+- **Problem 1**: expensive computation
+  - 超过95%的时间都是用来做feature computation
+
+Neural Approach: learn a dense and compact feature representation
+
+### 2.5.2 A Neural dependency parser
+
+#### 2.5.2.1 Results
+
+<img src="./dependency_parsing/neural_parser.png" alt="neural_parser" style="zoom:50%;" />
+
+#### 2.5.2.2 Model Architecture
+
+##### a. distributed representations
+
+- 单词 word : 用d维稠密向量表示
+
+  - 相似单词有相似的向量
+
+- POS(part-of-speech tags 词性) 和 dependency labels 也用 d维稠密向量表示
+
+  - 也有“相似性”
+
+    - 🌰 **NNS**(复数名词)应该接近**NN**(单数名词)
+
+    - 🌰 **num**(数值修饰语)应该接近**amod**(形容词修饰语)
+
+- 综合之后
+
+  <img src="./dependency_parsing/distributed_representations.png" alt="distributed_representations" style="zoom:50%;" />
+
+我们将其转换为词向量并将它们联结起来作为输入层，再经过若干非线性的隐藏层，最后加入softmax layer得到shift-reduce解析器的动作
+
+#### b. model arcgutecture
+
+<img src="./dependency_parsing/model_architecture.png" style="zoom:50%;" />
+
+- The hidden layer re-represents the input
+  - it moves inputs around in an intermediate layer vector space
+  - so it can be easily classified with a (linear) softmax
+- cross-entropy error will be back-propagated to the embeddings
+
+
+
+### 2.5.3 Graph-based dependency parsers [TODO]
+
+- Compute a score for every possible dependency for each word
+
+  - Doing this well requires good “contextual” representations of each word token, which we will develop in coming lectures
+
+    <img src="./dependency_parsing/graph_based1.png" alt="graph_based1" style="zoom:50%;" />
+
+  - And repeat the same process for each other word
+
+    <img src="./dependency_parsing/graph_based2.png" alt="graph_based2" style="zoom:50%;" />
+
+- [Dozat and Manning 2017; Dozat, Qi, and Manning 2017]
+
+- This paper revived interest in graph-based dependency parsing in a neural world 
+
+  - Designed a biaffine scoring model for neural dependency parsing •
+  - Also crucially uses a neural sequence model, something we discuss next week
+
+- Great results **but slower than the simple neural transition-based parsers**
+  - • There are $n^2$ possible dependencies in a sentence of length n
+
+  <img src="./dependency_parsing/res.png" alt="res" style="zoom:50%;" />
+
+## 2.6 Evaluation
 
  <img src="./dependency_parsing/evaluation1.png" alt="evaluation1" style="zoom:50%;" />
 
-- UAS = 忽略label (nsubj, root, etc)，只看arc的正确率 
+- UAS (unlabeled attachment score) = 忽略label (nsubj, root, etc)，只看arc的正确率 
 
 - LAS = 包括label+arc 的正确率
 
 
 
-## Why train a neural dependency parser？
 
-<img src="./dependency_parsing/why_neural.png" alt="why_neural" style="zoom:50%;" />
 
-<img src="./dependency_parsing/neural_parser.png" alt="neural_parser" style="zoom:50%;" />
 
-<img src="./dependency_parsing/model_architecture.png" style="zoom:50%;" />
+
+
 
