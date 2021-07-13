@@ -374,13 +374,15 @@ ref [universal dependencies](https://universaldependencies.org/)
 
 3. MaltParser 用ML classifier预测下一步的action $O(n)$
    
+4. NN 
+
    
 
 ## 2.4 MaltParser
 
 ### 2.4.1 介绍
 
-- Each action is predicted by a discrimnatvie classifier (e.g. softmax classifier) over each legal move
+- Each action is predicted by a **discrimnatvie classifier** (e.g. softmax classifier) over each legal move
   - Max of 3 uptyped choices (shift, left arc, right arc);
   - Max of |R| X 2 + 1 when typed
     - put labels on the dependencies (label: subject, object, etc)
@@ -391,7 +393,7 @@ ref [universal dependencies](https://universaldependencies.org/)
   - But you can profitably do a beam search if you wish (slower but better)
     - You keep k good parse prefixes at each time step 
 - The model’s accuracy is fractionally below the state of the art in dependency parsing, but 
-- 【快】It provides **very fast linear time parsing**, with high accuracy – great for parsing the web
+- 【优点：快】It provides **very fast linear time parsing**, with high accuracy – great for parsing the web
 
 ### 2.4.2 Conventional Feature Representation
 
@@ -416,25 +418,37 @@ Neural Approach: learn a dense and compact feature representation
 
 ### 2.5.2 A Neural dependency parser
 
+>  🎯 predict a **transition sequence** from some initial configuration c to a terminal configuration, in which the dependency parse tree is encoded
+
 #### 2.5.2.1 Results
 
 <img src="./dependency_parsing/neural_parser.png" alt="neural_parser" style="zoom:50%;" />
 
+- NN 的方法（C & M 2014）在保持精度的情况下，运算速度非常快。
+
 #### 2.5.2.2 Model Architecture
 
-##### a. distributed representations
+##### a. Feature Selection
 
-- 单词 word : 用d维稠密向量表示
+对于给定句子 S ,它的特征通常包括下面的子集
 
+- $S_{word}$ = Vector representations for some of the words in S (and their dependents) at the top of the stack $\sigma$ and buffer $\beta$.
   - 相似单词有相似的向量
+- $S_{tag}$ （词性）= Part-of-Speech (POS) tags for some of the words in S. 
+  - POS tags comprise a small, discrete set
+  - P = {NN, NNP, NNS, DT, JJ, ...}
 
-- POS(part-of-speech tags 词性) 和 dependency labels 也用 d维稠密向量表示
+- $S_{label}$ = The arc-labels for some of the words in S. 
+  - The arc-labels comprise a small, discrete set
+  - describing the dependency relation
+  - L = {amod, tmod, nsubj, csubj, dobj, ...}
 
-  - 也有“相似性”
+**注意**⚠️
 
-    - 🌰 **NNS**(复数名词)应该接近**NN**(单数名词)
-
-    - 🌰 **num**(数值修饰语)应该接近**amod**(形容词修饰语)
+1. POS 和 dependency labels 也有“相似性”
+   - 🌰 **NNS**(复数名词)应该接近**NN**(单数名词)
+   - 🌰 **num**(数值修饰语)应该接近**amod**(形容词修饰语)
+2. 三者都是distributed representations
 
 - 综合之后
 
@@ -442,7 +456,25 @@ Neural Approach: learn a dense and compact feature representation
 
 我们将其转换为词向量并将它们联结起来作为输入层，再经过若干非线性的隐藏层，最后加入softmax layer得到shift-reduce解析器的动作
 
-#### b. model arcgutecture
+#### b. Feature Selection Example
+
+考虑对$S_{word}$，$S_{tag}$，$S_{label}$ 的选择：
+
+1. $S_{word}$ 
+   - $\sigma$ 和 $\beta$ 前三个单词：$s_1,s_2,s_3,b_1,b_2,b_3$;
+   - $\sigma$ 前两个单词的前两个 leftmost / rightmost 子单词：$ lc_1(s_i), rc_1(s_i), lc_2(s_i), rc_2(s_i)$, $i = 1, 2$.
+   - $\sigma$ 前两个单词的 leftmost of leftmost / rightmost of rightmost 子单词：$ lc_1(lc_1(s_i)), rc_1(rc_1(s_i))$, $i = 1, 2$.
+   - $n_{w} = 18$
+2. $S_{tag}$
+   - 对应的词性标注
+   - $n_{t} = 18$
+3. $S_{label}$
+   - 对应的arc label，但除去在 $\sigma$ 和 $\beta$ 的6歌单词
+   - $n_{l} = 12$
+
+- `NULL` token = 不存在的元素：当stack 和 buffer 为空，或者 依存关系还未被指定。
+
+#### c. Model Arcgutecture
 
 <img src="./dependency_parsing/model_architecture.png" style="zoom:50%;" />
 
@@ -451,7 +483,7 @@ Neural Approach: learn a dense and compact feature representation
   - so it can be easily classified with a (linear) softmax
 - cross-entropy error will be back-propagated to the embeddings
 
-
+- 图中使用的non-linear function 是 $f(x) = x^3$.(hidden layer)
 
 ### 2.5.3 Graph-based dependency parsers [TODO]
 
