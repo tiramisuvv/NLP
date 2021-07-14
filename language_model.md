@@ -4,12 +4,12 @@
 
 - VIEW 1
 
-<img src="/Users/weiwang/Documents/NLP/language_model/def1.png" alt="def1" style="zoom:50%;" />
+<img src="./language_model/def1.png" alt="def1" style="zoom:50%;" />
 
 - classifier ，给出 V 中任何一个单词 w 出现的概率
 - VIEW 2
 
-<img src="/Users/weiwang/Documents/NLP/language_model/def2.png" alt="def2" style="zoom:50%;" />Some application
+<img src="./language_model/def2.png" alt="def2" style="zoom:50%;" />Some application
 
 1. 手机打单词，会补全；
 2. Google search
@@ -61,7 +61,7 @@ $$
 
 **Markov 假设** 当前单词$w_{t+1} = x^{(t+1)}$ 只依赖于它前n-1个单词。
 
-<img src="/Users/weiwang/Documents/NLP/language_model/Markov_Assumption.png" alt="Markov_Assumption" style="zoom:50%;" />
+<img src="./language_model/Markov_Assumption.png" alt="Markov_Assumption" style="zoom:50%;" />
 
 ### 2.3.2 How to get thest n-gram and (n-1) grams probabilities?
 
@@ -112,7 +112,7 @@ $$
 
 - 因为是4-gram，所以忽略前面内容：as the proctor started the clock, the
 
-  <img src="/Users/weiwang/Documents/NLP/language_model/example_4gram.png" alt="example_4gram" style="zoom:50%;" />
+  <img src="./language_model/example_4gram.png" alt="example_4gram" style="zoom:50%;" />
 
 $$
 P(\bold{w}|\text{students opened their}) = \frac{\text{count}(\text{students open their }\bold{w})}{\text{count}(\text{students open their})}
@@ -132,7 +132,7 @@ $$
 
 ### 2.3.4 Sparsity Problems
 
-<img src="/Users/weiwang/Documents/NLP/language_model/SparsityProblems.png" alt="SparsityProblems" style="zoom:50%;" />
+<img src="./language_model/SparsityProblems.png" alt="SparsityProblems" style="zoom:50%;" />
 
 
 
@@ -150,7 +150,7 @@ $$
 
 ### 2.3.4 Storage Problems
 
-<img src="/Users/weiwang/Documents/NLP/language_model/StorageProblems.png" alt="StorageProblems" style="zoom:50%;" />
+<img src="./language_model/StorageProblems.png" alt="StorageProblems" style="zoom:50%;" />
 
 下表给出了n-gram模型中模型参数数量随着的逐渐增大而变化的情况，其中假定词汇量为 $|V| = 200,000$(汉语的词汇量大致是这个量级)。
 
@@ -255,9 +255,9 @@ $$
 - 对于任何一个出现r的n-gram，都假设它出现了$r^*$次，这里
 
 
-  $$
+$$
   r^*=(r+1)\frac{n_{r+1}}{n_r}
-  $$
+$$
 
   - 其中$n_r$ 是恰好出现r次的n-gram的数目	
 
@@ -281,13 +281,13 @@ $$
 
 ### 3.1.1 Basic Architecture
 
-<img src="/Users/weiwang/Documents/NLP/language_model/Window-based1.png" alt="Window-based1" style="zoom:50%;" />
+<img src="./language_model/Window-based1.png" alt="Window-based1" style="zoom:50%;" />
 
 ### 3.1.2 Apply to example
 
 - window size = 4
 
-  <img src="/Users/weiwang/Documents/NLP/language_model/Window-based2.png" alt="Window-based2" style="zoom:50%;" />
+  <img src="./language_model/Window-based2.png" alt="Window-based2" style="zoom:50%;" />
 
 ### 3.1.3 Summary
 

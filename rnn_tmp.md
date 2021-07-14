@@ -31,9 +31,10 @@ Vacabulary :30K-50K
 
 - 结构 architectures 
 
-  - $T_x = T_y$  
+  - $T_x = T_y$
 
- <img src="./rnn/structure.png" alt="structure" style="zoom:50%;" />
+- <img src="./rnn/structure.png" alt="structure" style="zoom:50%;" />
+- 
 
 - 利用前面的信息
 
@@ -49,24 +50,149 @@ Vacabulary :30K-50K
 
   [TODO] $T_x \neq T_y$ 是怎么做的-> different types
 
-  ## Different types
-
-  1. many-to-many
-     1. $T_x = T_y$
-     2. $T_x \neq T_y$
-        1. machine translation 
-        2. 
-  2. many-to-one
-     1. 🌰 setimant classification
-  3. one-to-many
-     1. music generation 
-     2. 
-
-  <img src="./rnn/summary_types.png" alt="summary_types" style="zoom:50%;" />
+  
 
   
+
+  # Recurrent Neural Networks (RNN)
+
+  <img src="./rnn/architecture.png" alt="architecture" style="zoom:50%;" />
+
+  -  hidden **states**: a single state that's mutating over time(several version of the same thing) 
+  - **Core idea** Apply the same weights W repeatedly
+
   
-  
+
+  ## Example 
+
+  <img src="./rnn/simple_example.png" alt="simple_example" style="zoom:50%;" />
+
+- current hidden state based on previous hidden state and current input 
+
+✅
+
+- Can process **any length** input
+- Computation for step t can (in theory) use information from **many steps back**
+- **Model size doesn’t increase** for longer input context 
+
+- Same weights applied on every timestep, so there is **symmetry** in how inputs are processed.
+
+❎ 
+
+- Recurrent computation is **slow** 
+- In practice, difficult to access information from **many steps back**
+
+
+
+## Training a RNN Language Model
+
+<img src="/Users/Wei/Library/Application Support/typora-user-images/Screen Shot 2021-07-13 at 10.39.52 PM.png" alt="Screen Shot 2021-07-13 at 10.39.52 PM" style="zoom:50%;" />
+
+
+
+<img src="./rnn/how_to_train.png" alt="how_to_train" style="zoom:50%;" />
+
+<img src="./rnn/how_to_train2.png" alt="how_to_train2" style="zoom:50%;" />
+
+**Problem** : Computing loss and gradients across entire corpus $$ is too expensive!
+
+<img src="./rnn/Screen Shot 2021-07-13 at 10.43.36 PM.png" alt="Screen Shot 2021-07-13 at 10.43.36 PM" style="zoom:50%;" />
+
+- 第二条补充：shorter unit of text
+
+## Backpropagation for RNN
+
+<img src="./rnn/backprop.png" alt="backprop" style="zoom:50%;" />
+
+<img src="./rnn/backprop2.png" alt="backprop2" style="zoom:50%;" />
+
+<img src="./rnn/backprop3.png" alt="backprop3" style="zoom:50%;" />
+
+<img src="./rnn/backprop4.png" alt="backprop4" style="zoom:50%;" />
+
+[TODO]
+
+## Generating text with an RNN Language Model
+
+<img src="./rnn/generate_text_example.png" alt="generate_text_example" style="zoom:50%;" />
+
+
+
+- RNN 不能记住overall的信息（比如之前在做或者做过什么事情）
+
+
+
+[TODO: 移入language model的笔记]
+
+## Evaluating Language Models
+
+<img src="./rnn/evaluation.png" alt="evaluation" style="zoom:50%;" />
+
+=> min(J(\theta)) 等价于 min(perplexity)
+
+
+
+## Why should we care about Language Modeling? 
+
+- Language Modeling is a **benchmark task** that helps us **measure our progress** on understanding language
+- Language Modeling is a **subcomponent** of many NLP tasks, especially those involving **generating text** or **estimating the probability of text**:
+  - Predictive typing 
+  - Speech recognition 
+  - Handwriting recognition 
+  - Spelling/grammar correction 
+  - Authorship identification 
+  - Machine translation 
+  - Summarization 
+  - Dialogue 
+  - etc
+
+<img src="./rnn/Screen Shot 2021-07-13 at 11.14.39 PM.png" alt="Screen Shot 2021-07-13 at 11.14.39 PM" style="zoom:50%;" />
+
+
+
+## Other applications of RNN
+
+### 1. tagging e.g., part-of-speech tagging, named entity recognition
+
+<img src="./rnn/application_example1.png" alt="application_example1" style="zoom:50%;" />
+
+### 2 .sentiment classification
+
+<img src="./rnn/application_example2_1.png" alt="application_example2_1" style="zoom:50%;" />
+
+<img src="./rnn/application_example2_2.png" alt="application_example2_2" style="zoom:50%;" />
+
+### 3. encode model
+
+<img src="./rnn/application_example3.png" alt="application_example3" style="zoom:50%;" />
+
+文字版的问题 --通过RNN --> 代表question的something
+
+### 4. generate text
+
+<img src="./rnn/application_example4.png" alt="application_example4" style="zoom:50%;" />
+
+- 在speech recognition里，一般用WER （word error rate）作为衡量标准，有时候也用 perplexity
+- conditional language model =there's some kind of input that we need to condition on
+
+## Different types
+
+1. many-to-many
+   1. $T_x = T_y$
+   2. $T_x \neq T_y$
+      1. machine translation 
+      2. 
+2. many-to-one
+   1. 🌰 setimant classification
+3. one-to-many
+   1. music generation 
+   2. 
+
+<img src="./rnn/summary_types.png" alt="summary_types" style="zoom:50%;" />
+
+
+
+
 
 ## Backpropagation through time
 
