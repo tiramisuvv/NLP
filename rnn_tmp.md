@@ -212,21 +212,88 @@ Character-level language model
 
 ## Vanishing Gradients with RNN
 
-### Why happened
+### 1. Why happened
+
+<img src="/Users/weiwang/Documents/NLP/rnn/vanishing_gradient.png" alt="vanishing_gradient" style="zoom:50%;" />
 
 - may have very long term dependency 
   - The ==cat==. Which already ate ..., ==was== full
 
   - The ==cats==. Which already ate ..., ==were== full
-
 - $\frac{\part \text{error}}{\part \text{前排参数}} \approx 0$ 
-
 - The basic RNN model has many local influence
 
+### 2 why a problem
+
+#### 1. 丧失 long term effect
 
 
-1. vanishing gradient bigger problem
-2. exploding graident also problem
+
+<img src="/Users/weiwang/Documents/NLP/rnn/vanishing_gradient2.png" alt="vanishing_gradient2" style="zoom:50%;" />
+
+
+
+#### 2.  当gradient很小的时候，无法判断是完成学习还是错误参数
+
+Gradient = a measure of the effect of the past on the future
+
+it the gradient becomes vanishingly small over longer distances (step t to t+n), we can't tell whether:
+
+a. There's **no dependency** between step t and t+n in the data -> 这种情况下，本身t 和 t+n 没有关联，所以 gradient 很小是合理的；
+
+b. We have **wrong parameters** to capture the true dependency between t and t+n -> 这种情况下，本身是有关联的，理论上也应该学习到这种关系，但是由于我们错误的参数，让模型认为他们之间是没有关系的，所以我们也学不到两者之间的依赖关系
+
+Gradient vanishing 让我们无法确定上二者哪个发生
+
+### 3. Example 🌰
+
+1. **LM task**: When she tried to print her ==tickets==, she found that the printer was out of toner. She went to the stationery store to buy more toner. It was very overpriced. After installing the toner into the printer, she finally printed her ________
+
+- 模型需要学习到 7th step 的 **"tickets"** 和 目标单词  ________ 的关系。
+
+2. **LM task**: The writer of the boos ________ 
+   - IS
+   - ARE
+
+- syntactic recency (语法新近度) ：The  <u>writer</u> of the books <u>is</u> （correct)
+- sequential recency (顺序新近度) :The writer of the <u>books</u> <u>are</u> (incorrect)
+- RNN 更擅长学习  sequential recency，而不是 syntactic recency
+
+
+
+### 4. Solution
+
+- The main problem = RNN 不能在长时间内保存信息。
+
+  -  **it’s too difficult for the RNN to learn to preserve information over many timesteps.**
+
+- In a vanilla RNN, the hidden state is **constantly being rewritten**
+  $$
+  h^{(t)} = \sigma\left ( W_hh^{(t-1)} + W_x x^{(t)} + b\right)
+  $$
+
+  - 所以很难把信息从前一个hidden state 保存到 下一个hidden state
+
+- **Idea**：Add separate **memory** to  a RNN 
+
+## Exploding gradient
+
+<img src="/Users/weiwang/Documents/NLP/rnn/sgd.png" alt="sgd" style="zoom:30%;" />
+
+- 当gradient 很大的时候，更新变化很大
+- 可能出现 **inf** 或者 **NaN**
+
+### Solution: Gradient clipping
+
+当 gradient > 某个threshold, 使用 scale后的 gradient 对SGD更新
+
+<img src="/Users/weiwang/Documents/NLP/rnn/grad_clipping.png" alt="grad_clipping" style="zoom:50%;" />
+
+**Idea** 不改变方向，只更新一小步
+
+<img src="/Users/weiwang/Documents/NLP/rnn/grad_clipping2.png" alt="grad_clipping2" style="zoom:50%;" />
+
+1. exploding graident also problem
    1. 容易发现
    2. solution: gradient clipping
 
@@ -275,11 +342,46 @@ FULL GRU
 
 <img src="/Users/weiwang/Documents/NLP/rnn/gru_full.png" alt="gru_full" style="zoom:50%;" />
 
-
-
-
-
 ## LSTM
+
+### 1. Structrue
+
+除了 hidden state，相比RNN 增加了 cell state来存储长期信息；
+
+- On step t, there is a **hidden state** $h^{(t)}$ and a **cell state** $c^{(t)}$ 
+  - Both are vectors length n 
+  - The cell stores **long-term information**
+  - The LSTM can **read**, **erase**, and **write** information from the cell
+    -  The cell becomes conceptually rather like RAM in a computer
+
+使用3个 🚪 来控制对信息的读，擦，写
+
+- The selection of which information is erased/written/read is controlled by three corresponding **gates**
+  - The gates are also vectors length n 
+  - On each timestep, each element of the gates can be **open** (1),** closed** (0), or somewhere in-between
+  - The gates are **dynamic**: their value is computed based on the current context 
+
+### 2. Equations
+
+<img src="/Users/weiwang/Documents/NLP/rnn/lstm2.png" alt="lstm2" style="zoom:50%;" />
+
+问题1: 为什么 forget gate 只使用 $h^{(t-1)}$ 的信息，而不用 $c^{(t-1)}$，即直接看之前的原始数据来决定要不要舍弃；
+
+问题2: 为什么hidden state 里，要对 $c^{(t)}$ 去 $\tanh$ 
+
+### 3. Graph Version
+
+
+
+<img src="/Users/weiwang/Documents/NLP/rnn/lstm3.png" alt="lstm3" style="zoom:50%;" />
+
+<img src="/Users/weiwang/Documents/NLP/rnn/lstm4.png" alt="lstm4" style="zoom:50%;" />
+
+
+
+
+
+
 
 - $a^{<t>} = C^{<t>}$ 不成立；
 - 更新$C^{<t>}$ 的Gates有两个update $\Gamma_u$ 和forget  $\Gamma_f$  
