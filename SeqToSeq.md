@@ -1,21 +1,228 @@
 ## Sequnce to sequence model
 
+<img src="/Users/Wei/Documents/NLP/NLP/seq2seq/relations.png" alt="relations" style="zoom:50%;" />
+
+# 1. Machine Translation
+
+## 1.1 Definition 
+
+- **Machine Translation (MT)** is the task of translating a sentence x from one language (the **source language**) to a sentence y in another language (the **target language**).
+
+- Example:
+
+<img src="/Users/Wei/Documents/NLP/NLP/seq2seq/MT_example.png" alt="MT_example" style="zoom:50%;" />
+
+## 1.2 History
+
+### 1.2.1 
+
+### 1.2.2 1990s-2010s: Statistical MT
+
+<img src="/Users/Wei/Documents/NLP/NLP/seq2seq/stat_MT.png" alt="stat_MT" style="zoom:50%;" />
+
+**Question** How to learn translation model $P(x|y)$
+
+**Ans**: 1. need large amount of **parallel data**
+
+**Question** How to learn translation model $P(x|y)$​ from the parallel corpus?
+
+**Ans**: Learn $P(x, a|y)$, where a is the **alignment**.  i.e. word-level correspondence between source sentence x and target sentence y
+
+<img src="/Users/Wei/Documents/NLP/NLP/seq2seq/alignment.png" style="zoom:50%;" />
+
+  #### Alignment
+
+Alignment is the **correspondence between particular words** in the translated sentence pair. 
+
+- **Typological differences** between languages lead to complicated alignments! 
+- 
+- Note: Some words have no counterpart
+
+<img src="/Users/Wei/Documents/NLP/NLP/seq2seq/alignment1.png" style="zoom:50%;" />
+
+<img src="/Users/Wei/Documents/NLP/NLP/seq2seq/alignment2.png" style="zoom:50%;" />
+
+<img src="/Users/Wei/Documents/NLP/NLP/seq2seq/alignment3.png" style="zoom:50%;" />
+
+<img src="/Users/Wei/Documents/NLP/NLP/seq2seq/alignment4.png" style="zoom:50%;" />
+
+<img src="/Users/Wei/Documents/NLP/NLP/seq2seq/alignment5.png" style="zoom:50%;" />
+
+**Question**: How to compute this argmax?
+
+<img src="/Users/Wei/Documents/NLP/NLP/seq2seq/decode.png" style="zoom:50%;" />
+
+<img src="/Users/Wei/Documents/NLP/NLP/seq2seq/decoding.png" alt="decoding" style="zoom:50%;" />
+
+### 1.2.3 Neural Machine Translation
+
+- **Neural Machine Translation (NMT)** is a way to do Machine Translation with a single end-to-end neural network 
+- The neural network architecture is called a **sequence-to-sequence** model (aka **seq2seq**) and it involves **two RNNs**
 
 
-### Machine Translation
 
-1. Language model：
+Language model：
 
-   $x^{<2>} := \hat{y}^{<1>}$
+$x^{<2>} := \hat{y}^{<1>}$
 
-   
 
-2. 
+
+1. 
 
 - encoder network: RNN
 - decoder network
 
+# Seq2seq Model
+
+<img src="/Users/Wei/Documents/NLP/NLP/seq2seq/seq2seq_architecture.png" alt="seq2seq_architecture" style="zoom:50%;" />
+
+- The sequence-to-sequence model is an example of a **Conditional Language Model**
+  - **Language Model** because the decoder is predicting the next word of the target sentence y 
+  - **Conditional** because its predictions are also conditioned on the source sentence x
+
+### Training a Neural Machine Translation system
+
+ <img src="/Users/Wei/Documents/NLP/NLP/seq2seq/seq2seq_train.png" style="zoom:50%;" />
+
+
+
+## How to train
+
+### X.1 Greedy decoding
+
+<img src="/Users/Wei/Documents/NLP/NLP/seq2seq/greedy.png" style="zoom:50%;" />
+
+**Problems** with greedy decoding: Greedy decoding has **no way to undo decisions**! 
+
+
+
+### X.2 Beam search decoding
+
+**Core idea**: On each step of decoder, keep track of the **k most probable** partial translations (which we call **hypotheses**)
+
+- k is the beam size (in practice around 5 to 10)
+
+A hypothesis $y_1, ..., y_t$​​ has a **score** which is its log probability:[TODO]
+
+- $$
+  \text{score}(y_1, ...y_t) = \log P_{\text{LM}}
+  $$
+
+  
+
+- Beam search is not guaranteed to find optimal solution • But much more efficient than exhaustive search!
+
+#### Example
+
+<img src="/Users/Wei/Documents/NLP/NLP/seq2seq/beam_search_example.png" alt="beam_search_example" style="zoom:50%;" />
+
+
+
+#### Stop criterion
+
+In beam search decoding, different hypotheses may produce `<END>`  tokens on **different timesteps** 
+
+-  When a hypothesis produces , that hypothesis is complete.
+- Place it aside and continue exploring other hypotheses via beam search.
+
+Usually we continue beam search until: 
+
+- We reach timestep T (where T is some pre-defined cutoff), or
+
+- We have at least n completed hypotheses (where n is pre-defined cutoff)
+
+
+
+#### How to select top one with highest score?
+
+- **Problem** with the highest score:
+
+  - $$
+    分数 score(y_1,....,y_t)
+    $$
+
+  -  **longer hypotheses have lower scores**
+
+  
+
+- 
+
+- Fix: **Normalize by length** :
+
+  - $$
+    TODO
+    $$
+
+- 
+
+## Advantage of NMT 
+
+compared to SMT
+
+- Better **performance**
+  - More **fluent**
+  - Better use of **context**
+  - Better use of **phrase similarities**
+- A **single neural network** to be optimized end-to-end 
+  - No subcomponents to be individually optimized
+- Requires much **less human engineering effort**
+  - No feature engineering
+  - Same method for all language pairs
+
+
+
+## Disadvantage of NMT 
+
+- NMT is **less interpretable**
+  - Hard to debug 
+- NMT is **difficult to control**
+  - For example, can’t easily specify rules or guidelines for translation
+  - Safety concerns!
+
+
+
+### MT Evaluation : BLEU
+
+- BLEU = Bilingual Evaluation Understudy)
+
+- BLEU compares the <u>machine-written translation</u> to one or several <u>human-written translation(s)</u>, and computes a **similarity score** based on: 
+  - n-gram precision (usually for 1, 2, 3 and 4-grams)
+  - Plus a penalty for too-short system translations
+- BLEU is **useful** but **imperfect**
+  - There are many valid ways to translate a sentence 
+  - So a good translation can get a poor BLEU score because it has low n-gram overlap with the human translation
+
+### Difficulties remain
+
+- **Out-of-vocabulary** words
+- **Domain mismatch** between train and test data
+- Maintaining **context** over longer text
+- **Low-resource** language pairs 
+- Failures to accurately capture **sentence meaning**
+- **Pronoun** (or **zero pronoun**) **resolution** errors
+- **Morphological agreement** errors
+
+- Using **common sense** is still hard
+- NMT picks up **biases** in training data
+
+- **Uninterpretable** systems do **strange things**
+- <img src="/Users/Wei/Documents/NLP/NLP/seq2seq/MT_difficulty_example.png" alt="MT_difficulty_example" style="zoom:50%;" />
+
+[TODO]解释 [ref](https://www.skynettoday.com/briefs/google-nmt-prophecies)
+
+
+
 <img src="./seq2seq/translate_example.png" alt="example" style="zoom:50%;" />
+
+
+
+
+
+
+
+
+
+
 
 ### Image captioning
 
@@ -163,6 +370,39 @@ modified precision = MT output中重复出现的单词，只能拿到reference�
 - 蓝色 RNN 对于短句子效果好，但长句子效果骤降
   - 需要记住一整句话，然后翻译
 - 绿色 Attention
+- 【Informational bottleneck 】因为encoder RNN 强制所有信息（source sentence）到最后一个vector
+- <img src="/Users/Wei/Documents/NLP/NLP/seq2seq/bottleneck.png" style="zoom:50%;" />
+- 橙色内容
+
+### Architecture
+
+
+
+### Equation
+
+P75  
+
+### Advantage vs NMT
+
+- Attention significantly **improves NMT performance**
+  - It’s very useful to allow decoder to focus on certain parts of the source 
+- Attention **solves the bottleneck problem**
+  - Attention allows decoder to look directly at source; bypass bottleneck
+- Attention **helps with vanishing gradient problem**
+  - Provides shortcut to faraway states
+- Attention provides **some interpretability**
+  - By inspecting attention distribution, we can see what the decoder was focusing on
+  - We get (soft) alignment for free! 
+  - This is cool because we never explicitly trained an alignment system 
+  - The network just learned alignment by itself
+
+
+
+P77：
+
+values：all information
+
+query: is somehow determining how it's gonna pay attation to the values 
 
 ### Intuition
 

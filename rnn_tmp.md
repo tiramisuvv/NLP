@@ -214,7 +214,7 @@ Character-level language model
 
 ### 1. Why happened
 
-<img src="/Users/weiwang/Documents/NLP/rnn/vanishing_gradient.png" alt="vanishing_gradient" style="zoom:50%;" />
+<img src="./rnn/vanishing_gradient.png" alt="vanishing_gradient" style="zoom:50%;" />
 
 - may have very long term dependency 
   - The ==cat==. Which already ate ..., ==was== full
@@ -229,7 +229,7 @@ Character-level language model
 
 
 
-<img src="/Users/weiwang/Documents/NLP/rnn/vanishing_gradient2.png" alt="vanishing_gradient2" style="zoom:50%;" />
+<img src="./rnn/vanishing_gradient2.png" alt="vanishing_gradient2" style="zoom:50%;" />
 
 
 
@@ -278,7 +278,7 @@ Gradient vanishing 让我们无法确定上二者哪个发生
 
 ## Exploding gradient
 
-<img src="/Users/weiwang/Documents/NLP/rnn/sgd.png" alt="sgd" style="zoom:30%;" />
+<img src="./rnn/sgd.png" alt="sgd" style="zoom:30%;" />
 
 - 当gradient 很大的时候，更新变化很大
 - 可能出现 **inf** 或者 **NaN**
@@ -287,60 +287,15 @@ Gradient vanishing 让我们无法确定上二者哪个发生
 
 当 gradient > 某个threshold, 使用 scale后的 gradient 对SGD更新
 
-<img src="/Users/weiwang/Documents/NLP/rnn/grad_clipping.png" alt="grad_clipping" style="zoom:50%;" />
+<img src="./rnn/grad_clipping.png" alt="grad_clipping" style="zoom:50%;" />
 
 **Idea** 不改变方向，只更新一小步
 
-<img src="/Users/weiwang/Documents/NLP/rnn/grad_clipping2.png" alt="grad_clipping2" style="zoom:50%;" />
+<img src="./rnn/grad_clipping2.png" alt="grad_clipping2" style="zoom:50%;" />
 
 1. exploding graident also problem
    1. 容易发现
    2. solution: gradient clipping
-
-### GRU gated recurrent unit 
-
-**Motivation** cat---> was
-
-= modification of hidden layer in RNN 
-
-+ (+) capture long range connections
-+ (+)Helps a lot with  vanishing gradient problem
-
-<img src="/Users/weiwang/Documents/NLP/rnn/rnn_unit.png" alt="rnn_unit" style="zoom:50%;" />
-
-
-
-增加 c = memory cell 来存储信息，比如 cat是单数还是复数
-
-$c^{<t>}:=$ memory cell value
-
-$a^{<t>}:=$ output activation value
-
-In GRU，取 $c^{<t>}:= a^{<t>}$ ，但在LSTM中不同。
-
-- $\tilde{C}^{<t>} = \tanh(W_c[c^{<t-1>, x^{<t>}}] + b_c)$
-- 遗忘门 $\Gamma_u = \sigma()$,between 0 and 1, u: undate ,
-  - $\Gamma_u$ 是否记住某个信息
-- $C^{<t>} = \Gamma_u *\tilde{C}^{<t>}  +(1-\Gamma_u) * C^{<t-1>}$
-  - $\Gamma_u = 0$ 保持旧信息
-    - 因为是$\sigma()$，当内部比较负的时候，会始终保持
-  - $\Gamma_u = 1$ 遗忘旧信息，记住t时刻的新信息；
-
-<img src="/Users/weiwang/Documents/NLP/rnn/GRU_unit.png" alt="GRU_unit" style="zoom:50%;" />
-
-
-
-=> 显著帮助vanishing gradient  problem
-
-【Q】没理解：$\Gamma_u$ 接近0，所以 $C^{<t>} \approx C^{<t-1>}$ 不就意味着不更新了么
-
-FULL GRU
-
-1. 增加Gate $\Gamma_r$ 告诉如果通过前一个时刻的$C^{<t-1>}$计算t时刻的候选$\tilde{C}^{<t>}$
-2. 其他paper的notation
-   1. h,u,c,h...
-
-<img src="/Users/weiwang/Documents/NLP/rnn/gru_full.png" alt="gru_full" style="zoom:50%;" />
 
 ## LSTM
 
@@ -363,7 +318,7 @@ FULL GRU
 
 ### 2. Equations
 
-<img src="/Users/weiwang/Documents/NLP/rnn/lstm2.png" alt="lstm2" style="zoom:50%;" />
+<img src="./rnn/lstm2.png" alt="lstm2" style="zoom:50%;" />
 
 问题1: 为什么 forget gate 只使用 $h^{(t-1)}$ 的信息，而不用 $c^{(t-1)}$，即直接看之前的原始数据来决定要不要舍弃；
 
@@ -373,11 +328,15 @@ FULL GRU
 
 
 
-<img src="/Users/weiwang/Documents/NLP/rnn/lstm3.png" alt="lstm3" style="zoom:50%;" />
+<img src="./rnn/lstm3.png" alt="lstm3" style="zoom:50%;" />
 
-<img src="/Users/weiwang/Documents/NLP/rnn/lstm4.png" alt="lstm4" style="zoom:50%;" />
+<img src="./rnn/lstm4.png" alt="lstm4" style="zoom:50%;" />
 
+### 4. Why solve vanishing gradients?
 
+- The LSTM architecture makes it easier for the RNN to preserve information over many timesteps
+  - In practice, you get about 100 timesteps rather than about 7
+- LSTM doesn’t guarantee that there is no vanishing/exploding gradient, but it does provide an easier way for the model to learn long-distance dependencies
 
 
 
@@ -388,7 +347,7 @@ FULL GRU
 - 增加output gate $\Gamma_o$
   - $a^{<t>} = \Gamma_o C^{<t>}$
 
-![lstm](/Users/weiwang/Documents/NLP/rnn/lstm.png)
+![lstm](./rnn/lstm.png)
 
 注意到，当设置合理的 $\Gamma_u, \Gamma_f$后，上面一行： $c^{<0>}$到$c^{<3>}$ 可以很快传递，保证了LSTM可以长时间很好的记住某些信息
 
@@ -397,6 +356,55 @@ FULL GRU
 - Gates also depends on $c^{<t-1>}$
 
 
+
+### GRU (Gated recurrent unit) 
+
+### 1. Equations
+
+<img src="/Users/Wei/Documents/NLP/NLP/rnn/gru.png" alt="gru" style="zoom:50%;" />Motivation** cat---> was
+
+= modification of hidden layer in RNN 
+
++ (+) capture long range connections
++ (+)Helps a lot with  vanishing gradient problem
+
+<img src="./rnn/rnn_unit.png" alt="rnn_unit" style="zoom:50%;" />
+
+
+
+增加 c = memory cell 来存储信息，比如 cat是单数还是复数
+
+$c^{<t>}:=$ memory cell value
+
+$a^{<t>}:=$ output activation value
+
+In GRU，取 $c^{<t>}:= a^{<t>}$ ，但在LSTM中不同。
+
+- $\tilde{C}^{<t>} = \tanh(W_c[c^{<t-1>, x^{<t>}}] + b_c)$
+- 遗忘门 $\Gamma_u = \sigma()$,between 0 and 1, u: undate ,
+  - $\Gamma_u$ 是否记住某个信息
+- $C^{<t>} = \Gamma_u *\tilde{C}^{<t>}  +(1-\Gamma_u) * C^{<t-1>}$
+  - $\Gamma_u = 0$ 保持旧信息
+    - 因为是$\sigma()$，当内部比较负的时候，会始终保持
+  - $\Gamma_u = 1$ 遗忘旧信息，记住t时刻的新信息；
+
+<img src="./rnn/GRU_unit.png" alt="GRU_unit" style="zoom:50%;" />
+
+
+
+=> 显著帮助vanishing gradient  problem
+
+【Q】没理解：$\Gamma_u$ 接近0，所以 $C^{<t>} \approx C^{<t-1>}$ 不就意味着不更新了么
+
+FULL GRU
+
+1. 增加Gate $\Gamma_r$ 告诉如果通过前一个时刻的$C^{<t-1>}$计算t时刻的候选$\tilde{C}^{<t>}$
+2. 其他paper的notation
+   1. h,u,c,h...
+
+<img src="./rnn/gru_full.png" alt="gru_full" style="zoom:50%;" />
+
+## 
 
 #### GRU VS LSTM
 
@@ -407,26 +415,96 @@ FULL GRU
   - more powerful, more effective 
   - more proven choice 
 
+- Researchers have proposed many gated RNN variants, but LSTM and GRU are the most widely-used 
+- The biggest difference is that GRU is **quicker to compute** and has fewer parameters
+- There is no conclusive evidence that one consistently performs better than the other 
+- LSTM is a **good default choice** (especially if your data has particularly long dependencies, or you have lots of training data) 
+- **Rule of thumb**: start with LSTM, but switch to GRU if you want something more efficient
 
+
+
+## Is vanishing/exploding gradient just a RNN problem?
+
+==No!==
+
+- It can be a problem for all neural architectures (including feed-forward and convolutional), especially very deep ones. 
+  - Due to chain rule / choice of nonlinearity function, gradient can become vanishingly small as it backpropagates 
+  - Thus, lower layers are learned very slowly (hard to train)
+- Solution: lots of new deep feedforward/convolutional architectures that **add more direct connections** (thus allowing the gradient to flow) 
+
+For example
+
+- Residual connections aka “ResNet” 
+- Also known as skip-connections
+- The identity connection preserves information by default
+- This makes deep networks much easier to train
+
+<img src="/Users/Wei/Documents/NLP/NLP/rnn/resnet.png" alt="resnet" style="zoom:50%;" />
+
+
+
+- Dense connections aka “DenseNet” 
+
+- Directly connect each layer to all future layers!
+
+![dense](/Users/Wei/Documents/NLP/NLP/rnn/dense.png)
+
+- Highway connections aka “HighwayNet” 
+
+- Similar to residual connections, but the identity connection vs the transformation layer is controlled by a dynamic gate
+- Inspired by LSTMs, but applied to deep feedforward/convolutional networks
+
+<img src="/Users/Wei/Documents/NLP/NLP/rnn/highway.png" alt="highway" style="zoom:50%;" />
+
+**Conclusion**: Though vanishing/exploding gradients are a general problem, **RNNs are particularly** unstable due to the **repeated** multiplication by the **same** weight matrix 
 
 ### Bidirectional RNN
 
-- 单向不够！只给前两个单词 "He said"，无法判断 "Teddy" 是人名 还是其他
-- <img src="/Users/weiwang/Documents/NLP/rnn/problem.png" alt="problem" style="zoom:50%;" />
+### 1. Motivation
 
-<img src="/Users/weiwang/Documents/NLP/rnn/BRNN.png" alt="BRNN" style="zoom:50%;" />
+#### 1.1 Example 1: He said, "Teddy ..."
+
+- 单向不够！只给前两个单词 "He said"，无法判断 "Teddy" 是人名 还是其他
+- <img src="./rnn/problem.png" alt="problem" style="zoom:50%;" />
+
+### 1.2 Example 2: terribly exciting 
+
+<img src="/Users/Wei/Documents/NLP/NLP/rnn/bidir_example.png" alt="bidir_example" style="zoom:50%;" />
+
+### Architecture
+
+<img src="/Users/Wei/Documents/NLP/NLP/rnn/bidir_architecture.png" alt="bidir_architecture" style="zoom:50%;" />
+
+<img src="/Users/Wei/Documents/NLP/NLP/rnn/bidir_equ.png" alt="bidir_equ" style="zoom:50%;" />
+
+<img src="./rnn/BRNN.png" alt="BRNN" style="zoom:50%;" />
 
 
 
 - (-)需要entire sentence 
 
+Note: bidirectional RNNs are only applicable if you have access to the **entire input sequence**
 
+- They are **not** applicable to Language Modeling, because in LM you only have left context available. 
+- If you do have entire input sequence (e.g., any kind of encoding), **bidirectionality is powerful** (you should use it by default).
 
-## Deep RNNs
+## Deep RNNs (Multi-layer RNNs)
 
-<img src="/Users/weiwang/Documents/NLP/rnn/deepRNN.png" alt="deepRNN" style="zoom:50%;" />
+- Multi-layer RNNs are also called **stacked RNNs**
+- <img src="/Users/Wei/Documents/NLP/NLP/rnn/multi-layer.png" alt="multi-layer" style="zoom:50%;" />
+
+<img src="./rnn/deepRNN.png" alt="deepRNN" style="zoom:50%;" />
 
 - 对RNN来说，3层已经很深了
   - 因为水平已经很长了
 - 更常见的是，3层RNN后续在$y^{<t>}$ 的位置加多层的NN（深但没有水平连接）
 - 
+- 
+
+Multi-layer RNNs in practice
+
+- **High-performing RNNs are often multi-layer** (but aren’t as deep as convolutional or feed-forward networks) 
+- For example: In a 2017 paper, Britz et al find that for Neural Machine Translation, 
+  - 2 to 4 layers is best for the encoder RNN, 
+  - 4 layers is best for the decoder RNN 
+  - Usually, skip-connections/dense-connections are needed to train deeper RNNs (e.g., 8 layers)
