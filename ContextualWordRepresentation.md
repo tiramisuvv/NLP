@@ -10,17 +10,15 @@
 
 (a summary of distributional semantics)
 
-
-
 > “… the complete meaning of a word is always contextual, and no study of meaning apart from a complete context can be taken seriously.”   
 >
-> ​                                                                                      --  J. R. Firth 1935:
+> ​                                                                                        --  J. R. Firth 1935:
 
 MEANING of word = the sense of the word inside a particular context of use (特定上下文中的单词含义  )
 
 
 
-🌰 Consider I **record** the **record**: the two instances of record mean different things.
+🌰 Consider I **record** the **record**: the two instances of **record** mean different things.
 
 ### 1.1 Before : Pretrained word embeddings
 
@@ -44,7 +42,7 @@ Each word has one representation.
 
 - Modeling
 
-  - Most of the parameters in our network are randomly initialized!
+  - Most of the parameters in our network are **randomly initialized**!
 
 - WANT = "context-specific representation of words"
 
@@ -97,6 +95,7 @@ Each word has one representation.
 
 - Idea: Want meaning of word in context, but standardly learn task RNN only on small task-labeled data (e.g., NER)
 - Why don’t we do semi-supervised approach where we train NLM on large unlabeled corpus, rather than just word vectors?
+- TagLM使用与上文无关的单词嵌入 + semi-supervised approach 的 RNN model 得到的 hidden states 作为特征输入
 
 ![TagLM](/Users/weiwang/Documents/NLP/contextual_representation/TagLM.png)
 
@@ -125,7 +124,8 @@ Language model observations
 • Well below just using an BiLSTM tagger on labeled data
 
 - 上面的pre-train system 是fixed 的
-- 
+
+
 
 ## 4. ELMo
 
@@ -202,6 +202,10 @@ ULMfit = Universal Language Model Fine-tuning
 
 <img src="/Users/weiwang/Documents/NLP/contextual_representation/ULMfit.png" alt="ULMfit" style="zoom:50%;" />
 
+- 在大型通用领域的无监督语料库上使用 biLM 训练
+- 在目标任务数据上调整 LM
+- 对特定任务将分类器进行微调
+
 ### Architecture
 
 <img src="/Users/weiwang/Documents/NLP/contextual_representation/ULMfit2.png" alt="ULMfit2" style="zoom:50%;" />
@@ -267,17 +271,17 @@ BERT = Bidirectional Encoder Representations from Transformers
 
 <img src="/Users/weiwang/Documents/NLP/contextual_representation/bert_1.png" alt="bert_1" style="zoom:50%;" />
 
-右边，第二层在读 <s> 时，由于输入是第一层的Bidir的结果，实际已经见过 open 
+右边，第二层在读 `<s>` 时，由于输入是第一层的Bi-Directional 的结果，实际已经见过 `open` 
 
 【GOAL】 Want: truly bidirectional information flow without leakage in a deep model 
 
-**Solution**: Mask out *k*% of the input words, and then predict the masked words
+**Solution**: Mask out *k* % of the input words, and then predict the masked words
 
 - Objective  : Mad Libs style fill in the blank
 
   <img src="/Users/weiwang/Documents/NLP/contextual_representation/BERT_mask.png" alt="BERT_mask" style="zoom:50%;" />
 
-- [-] cannot get as many predictions per sentence, only get 15% pf words instead of 100% of words
+- [-] cannot get as many predictions per sentence, only get 15% of words instead of 100% of words
 
 - [+] be able to see both direction  
 
@@ -375,6 +379,8 @@ To learn *relationships* between sentences, predict whether Sentence B is actual
 
 #### 7.6.2 Effect of Pre-training Task
 
+【Questions】 
+
 <img src="/Users/weiwang/Documents/NLP/contextual_representation/BERT_performance2.png" alt="BERT_performance2" style="zoom:50%;" />
 
 #### 7.6.3 Effect of Directionality and Training Time
@@ -410,6 +416,8 @@ XLNet: Generalized Autoregressive Pretraining for Language Understanding (Yang e
 
 ### 9.1 Innovation #1: Relative position embeddings
 
+[Questions] how to do?
+
 - Sentence:  `John ate a hot dog`，
 - Absolute attention: 
   - “How much should `dog` attend to `hot`(in any position), 
@@ -421,12 +429,24 @@ XLNet: Generalized Autoregressive Pretraining for Language Understanding (Yang e
 
 ### 9.2 Innovation #2: Permutation Language Modeling
 
+[Questions] how to do?
+
 - In a left-to-right language model, every word is predicted based on all of the words to its left
 - Instead: Randomly permute the order for every training sentence
 - **Equivalent to masking, but many more predictions per sentence**
 - Can be done efficiently with Transformers 
 
+<img src="/Users/weiwang/Documents/NLP/contextual_representation/XLNet_permutation.png" alt="XLNet_permutation" style="zoom:50%;" />
+
+- Permutation 目标：学习 "`学3`"
+
+<img src="/Users/weiwang/Documents/NLP/contextual_representation/XLNet_Permutation1.png" alt="XLNet_Permutation1" style="zoom:30%;" /><img src="/Users/weiwang/Documents/NLP/contextual_representation/XLNet_permutation2.png" alt="XLNet_permutation2" style="zoom:30%;" />
+
+
+
 Also used more data and bigger models, but showed that innovations improved on BERT even with same data and model size
+
+
 
 ### 9.3 Results
 
@@ -445,13 +465,17 @@ ALBERT =  A Lite BERT for Self-supervised Learning of Language Representations (
 
 - Share all parameters between Transformer layers
 
+SOP(Sentence order prediction) used ub ALBERT
+
+
+
 ### 10.3 Results
 
 <img src="/Users/weiwang/Documents/NLP/contextual_representation/ALBERT2.png" alt="ALBERT2" style="zoom:50%;" />
 
 
 
-## 11. T5
+## 11. T5 - Comparison
 
 T5 = Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer (Raffel et al, Google, 2019)
 
@@ -487,11 +511,30 @@ VS BERT
 - ELECTRA 是用 weak BERT 预测结果替换
 - => 模型更好的学习词汇直接的细微差别 
 
+**优点**：
+
+- Predicting yes/not is easier than reconstruction.
+- Every output position is used
+
+### Performance 
+
+FLOP
+
+<img src="/Users/weiwang/Documents/NLP/contextual_representation/ELECTRA_performance.png" alt="ELECTRA_performance" style="zoom:50%;" />
+
 <img src="/Users/weiwang/Documents/NLP/contextual_representation/ELECTRA_res.png" alt="ELECTRA_res" style="zoom:50%;" />
 
 
 
 ## Distillation
+
+## DistilBert
+
+
+
+先Bert+Fine tune，然后 distillate 可能优于 DistilBert + Finetune
+
+
 
 
 
